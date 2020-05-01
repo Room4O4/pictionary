@@ -19,6 +19,8 @@ io.on('connection', (socket) => {
       // log in the user
       const loginResult = await datastore.login(user);
       // automatically add the user to the default room
+      await game.addNewUser(user.id);
+
       socket.emit('S_C_LOGIN_RES', loginResult);
     } catch (error) {
       console.log('Error Logging in - ', error);

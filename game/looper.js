@@ -1,57 +1,90 @@
 class Looper {
-  constructor(room) {
+  constructor(room, roomEventBridge) {
     _gameStarted = false;
     _roundStarted = false;
-    _rounds = 0;
+    _roundsLeft = 0;
+    _totalRounds = 0;
     _room = room;
     _users = [];
-    ROUND_DURATION = 60;
+    _gameState = GAME_STATE_IDLE;
+    _currentWord = null;
+
+    _roomEventBridge = roomEventBridge;
+    _roomEventBridge.updateRoomState('GE_IDLE');
+
+    ROUND_DURATION = 60000;
+    GAME_STATE_IDLE = 0;
+    GAME_STATE_ROUND_IN_PROGRESS = 1;
+    GAME_STATE_ANNOUNCE_WINNER = 2;
   }
 
-  addUser(user) {
+  addUser(user, socket) {
     const foundUser = _users.find((user) => user.id === user.id);
     if (!foundUser) {
       _users.push(user);
     } else {
       console.log('user already in room');
     }
+    _roomEventBridge.updateUserSocket(user.id, socket);
+  }
+
+  evaluateRound() {
+    rounds--;
+    if (rounds == 0) {
+      // Game over
+      // emit game over
+      _gameStarted = false;
+      // announce winners
+    } else {
+      this.startRound();
+    }
   }
 
   startRound() {
     _roundStarted = true;
+    // emit round started
     // Pick a word from dictionary
+    _currentWord = 'BANANA';
+    _roomEvent.updateRoomState('GE_NEW_ROUND', _roundsLeft, _totalRounds, _currentWord);
+
     // Assign a user to draw
     // Assign other users to guess
     // start Timer
     // At the end of round, do _rounds--
     // Repeat till _rounds == 0
-    if (_rounds > 0) setTimeout(startRound, ROUND_DURATION);
-    else {
-      _roundStarted = false;
-      // announce game winners! Show winning banner for 10 secs and start next game
-    }
+    setTimeout(evaluateRound, ROUND_DURATION);
   }
+
+  announceWinner() {
+    console.log('Winner announced!');
+    _roomEvent.updateRoomState('GE_ANNOUNCE_WINNER');
+    _roundsLeft = 0;
+    _totalRounds = 0;
+    _currentWord = null;
+    setTimeout(() => (_gameState = GAME_STATE_IDLE), 10 * 1000);
+  }
+
   loop() {
-    // we need a min of 2 users to start a game
-    if (!_gameStarted && _users.length > 1) {
-      // reset scores
-      // start game
-      // emit game started
-      _gameStarted = true;
-      _rounds = _users.length;
-      // check if round is in progress else start round
-      // if round is in progress, wait for round to finish and update _rounds--
-      this.startRound();
-    } else if (_gameStarted && _users.length < 2) {
-      // stop game
-      // compute scores
-      // emit winner
-      _gameStarted = false;
-      _roundStarted = false;
-      _rounds = 0;
-    } else if (_gameStarted) {
-      // Eval guesses
-      // Keep updating scores
+    switch (_gameState) {
+      case GAME_STATE_IDLE:
+        if (_users.length > 1) {
+          _gameState = GAME_STATE_ROUND_IN_PROGRESS;
+          _roomEvent.updateRoomState('GE_NEW_GAME');
+          _roundsLeft = _users.length;
+          _totalRounds = users.length;
+          this.startRound();
+        }
+        break;
+      case GAME_STATE_ROUND_IN_PROGRESS:
+        if (_users.length < 2) {
+          _gameState = GAME_STATE_ANNOUNCE_WINNER;
+        }
+        break;
+      case GAME_STATE_ANNOUNCE_WINNER:
+        this.announceWinner();
+        break;
+      default:
+        break;
     }
   }
 }
