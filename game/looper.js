@@ -1,39 +1,47 @@
+const debug = require('debug')('pictionary.game.looper');
+
 class Looper {
   constructor(room, roomEventBridge) {
-    _gameStarted = false;
-    _roundStarted = false;
-    _roundsLeft = 0;
-    _totalRounds = 0;
-    _room = room;
-    _users = [];
-    _gameState = GAME_STATE_IDLE;
-    _currentWord = null;
+    this.ROUND_DURATION = 10000;
+    this.GAME_STATE_IDLE = 0;
+    this.GAME_STATE_ROUND_IN_PROGRESS = 1;
+    this.GAME_STATE_ANNOUNCE_WINNER = 2;
 
-    _roomEventBridge = roomEventBridge;
-    _roomEventBridge.updateRoomState('GE_IDLE');
-
-    ROUND_DURATION = 60000;
-    GAME_STATE_IDLE = 0;
-    GAME_STATE_ROUND_IN_PROGRESS = 1;
-    GAME_STATE_ANNOUNCE_WINNER = 2;
+    this._gameStarted = false;
+    this._roundStarted = false;
+    this._roundsLeft = 0;
+    this._totalRounds = 0;
+    this._room = room;
+    this._users = [];
+    this._gameState = this.GAME_STATE_IDLE;
+    this._currentWord = null;
+    this._winnerAnnouncementInProgress = false;
+    this._currentUserDrawIndex = 0;
+    this._roomEventBridge = roomEventBridge;
+    this._roomEventBridge.broadcastRoomState('GE_IDLE');
   }
 
-  addUser(user, socket) {
-    const foundUser = _users.find((user) => user.id === user.id);
+  addUser(dbUser, socket) {
+    const foundUser = this._users.find((user) => dbUser.id === user.id);
     if (!foundUser) {
-      _users.push(user);
+      this._users.push(dbUser);
     } else {
       console.log('user already in room');
     }
-    _roomEventBridge.updateUserSocket(user.id, socket);
+    this._roomEventBridge.updateUserSocket(dbUser.id, socket);
+    debug('Added new user - ', dbUser);
   }
 
   evaluateRound() {
-    rounds--;
-    if (rounds == 0) {
+    // At the end of round, do _rounds--
+    // Repeat till _rounds == 0
+    this._roundsLeft--;
+    if (this._roundsLeft == 0) {
       // Game over
       // emit game over
-      _gameStarted = false;
+      this._gameStarted = false;
+      this._gameState = this.GAME_STATE_ANNOUNCE_WINNER;
+      debug('Game over, Announce winner');
       // announce winners
     } else {
       this.startRound();
@@ -41,47 +49,63 @@ class Looper {
   }
 
   startRound() {
-    _roundStarted = true;
-    // emit round started
+    debug('start new round');
+
+    this._roundStarted = true;
     // Pick a word from dictionary
-    _currentWord = 'BANANA';
-    _roomEvent.updateRoomState('GE_NEW_ROUND', _roundsLeft, _totalRounds, _currentWord);
+    this._currentWord = 'BANANA';
 
     // Assign a user to draw
+
+    this._currentUserDrawIndex = (this._totalRounds - this._roundsLeft) % this._users.length;
+    const currentDrawingUser = this._users[this._currentUserDrawIndex];
+    debug('Current User Drawing - ', currentDrawingUser);
+
+    // emit round started
+    this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', this._roundsLeft, this._totalRounds);
+    this._roomEventBridge.sendWordToPlayer(currentDrawingUser.id, this._currentWord);
+
     // Assign other users to guess
+
     // start Timer
-    // At the end of round, do _rounds--
-    // Repeat till _rounds == 0
-    setTimeout(evaluateRound, ROUND_DURATION);
+    const that = this;
+    setTimeout(() => that.evaluateRound(), this.ROUND_DURATION);
   }
 
   announceWinner() {
-    console.log('Winner announced!');
-    _roomEvent.updateRoomState('GE_ANNOUNCE_WINNER');
-    _roundsLeft = 0;
-    _totalRounds = 0;
-    _currentWord = null;
-    setTimeout(() => (_gameState = GAME_STATE_IDLE), 10 * 1000);
+    debug('Winner announced!');
+    this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER');
+    this._roundsLeft = 0;
+    this._totalRounds = 0;
+    this._currentWord = null;
+    this._currentUserDrawIndex = 0;
+    this._winnerAnnouncementInProgress = true;
+    const that = this;
+    setTimeout(() => {
+      that._gameState = that.GAME_STATE_IDLE;
+      this._winnerAnnouncementInProgress = false;
+    }, 10 * 1000);
   }
 
   loop() {
-    switch (_gameState) {
-      case GAME_STATE_IDLE:
-        if (_users.length > 1) {
-          _gameState = GAME_STATE_ROUND_IN_PROGRESS;
-          _roomEvent.updateRoomState('GE_NEW_GAME');
-          _roundsLeft = _users.length;
-          _totalRounds = users.length;
+    debug('GAME_STATE: ', this._gameState);
+    switch (this._gameState) {
+      case this.GAME_STATE_IDLE:
+        if (this._users.length > 1) {
+          this._gameState = this.GAME_STATE_ROUND_IN_PROGRESS;
+          this._roomEventBridge.broadcastRoomState('GE_NEW_GAME');
+          this._roundsLeft = this._users.length;
+          this._totalRounds = this._users.length;
           this.startRound();
         }
         break;
-      case GAME_STATE_ROUND_IN_PROGRESS:
-        if (_users.length < 2) {
-          _gameState = GAME_STATE_ANNOUNCE_WINNER;
+      case this.GAME_STATE_ROUND_IN_PROGRESS:
+        if (this._users.length < 2) {
+          this._gameState = this.GAME_STATE_ANNOUNCE_WINNER;
         }
         break;
-      case GAME_STATE_ANNOUNCE_WINNER:
-        this.announceWinner();
+      case this.GAME_STATE_ANNOUNCE_WINNER:
+        if (!this._winnerAnnouncementInProgress) this.announceWinner();
         break;
       default:
         break;

@@ -1,6 +1,7 @@
 const datastore = require('../datastore');
 const Looper = require('../game/looper');
 const RoomEventBridge = require('../events');
+const debug = require('debug')('pictionary.game.index');
 
 let _roomLoopMap = {};
 let _rooms = ['main'];
@@ -13,18 +14,22 @@ exports.addNewRoom = async (name) => {
 exports.setSocketHandle = (io) => (_io = io);
 
 //user - user.id, user.socket
-exports.addNewUser = async (user, room) => {
+exports.addNewUser = async (userId, userSocket, room) => {
   try {
     if (!_rooms.includes(room)) throw new Error('No such room');
 
-    const dbUser = await datastore.getUser(user.id);
+    const dbUser = await datastore.getUser(userId);
     if (dbUser) {
       const looper = _roomLoopMap[room];
       if (looper) {
-        await looper.AddUser(dbUser, room);
+        await looper.addUser(dbUser, userSocket);
+        debug('Added user to room');
       } else {
-        const roomEventBridge = new RoomEventBridge(io, user.socket);
-        _roomLoopMap[room] = new Looper(room, roomEventBridge);
+        const roomEventBridge = new RoomEventBridge(_io);
+        const looper = new Looper(room, roomEventBridge);
+        await looper.addUser(dbUser, userSocket);
+        _roomLoopMap[room] = looper;
+        debug('Created Looper and add user to room');
       }
     } else {
       throw new Error('Could not find such a user in database');

@@ -7,7 +7,13 @@ function App() {
 
   useEffect(() => {
     const io = socket('http://localhost:3001');
-    io.on('UPD_SERVER_TIME', (data) => setServerTime(data));
+    io.on('connect', () => {
+      const user = {
+        id: `tom${+new Date()}`,
+        name: 'tom',
+      };
+      io.emit('C_S_LOGIN', user);
+    });
   }, []);
 
   return (
