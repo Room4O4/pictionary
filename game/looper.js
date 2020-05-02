@@ -32,6 +32,10 @@ class Looper {
     debug('Added new user - ', dbUser);
   }
 
+  removeUser(dbUser) {
+    // remove from _users
+  }
+
   evaluateRound() {
     // At the end of round, do _rounds--
     // Repeat till _rounds == 0

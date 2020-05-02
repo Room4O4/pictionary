@@ -14,6 +14,10 @@ class RoomEventBridge extends EventEmitter {
     socket.on('GE_NEW_GUESS', (args) => {
       this.emit('GE_NEW_GUESS', args.userId, args.guess);
     });
+
+    socket.on('C_S_LEAVE_ROOM', (args) => {
+      this.emit('C_S_LEAVE_ROOM', args.userId);
+    });
   }
 
   sendWordToPlayer(userId, word) {
