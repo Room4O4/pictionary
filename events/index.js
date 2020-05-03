@@ -2,28 +2,48 @@ const EventEmitter = require('events');
 const debug = require('debug')('pictionary.events.roomEventBridge');
 
 class RoomEventBridge extends EventEmitter {
-  constructor(io) {
+  constructor(io, room) {
     super();
-    this._userSocketMap = {};
+    this._userSocketIdMap = {};
     this._io = io;
+    this._room = room;
   }
 
-  // Add socket, or update socket when there is a reconnection?
-  updateUserSocket(userId, socket) {
-    this._userSocketMap[userId] = socket;
-    socket.on('GE_NEW_GUESS', (args) => {
-      this.emit('GE_NEW_GUESS', args.userId, args.guess);
-    });
+  getClientSocketInRoom(socketId){
+    const clients = this._io.sockets.adapter.rooms[this._room].sockets;
+    if(clients){
+      for (const id in clients) {
+        if (id === socketId) {
+          return this._io.sockets.connected[id];
+        }
+      }
+    } 
+    return null;
+  } 
 
-    socket.on('C_S_LEAVE_ROOM', (args) => {
-      this.emit('C_S_LEAVE_ROOM', args.userId);
-    });
+  // Add socket, or update socket when there is a reconnection?
+  updateUserSocket(userId, socketId) {
+    this._userSocketIdMap[userId] = socketId;
+    let clientSocket = this.getClientSocketInRoom(socketId);
+    debug('Client socket found', clientSocket.id);
+    if(clientSocket){
+      clientSocket.on('GE_NEW_GUESS', (args) => {
+        this.emit('GE_NEW_GUESS', args.userId, args.guess);
+      });
+  
+      clientSocket.on('C_S_LEAVE_ROOM', (args) => {
+        this.emit('C_S_LEAVE_ROOM', args.userId);
+      });
+    } else {
+      debug(`Unable to find client socket with id ${socketId} in room ${this._room}`);
+    }
+    
   }
 
   sendWordToPlayer(userId, word) {
     debug('send word to player: ', userId, word);
-    const socket = this._userSocketMap[userId];
-    socket.emit('GE_NEW_WORD', word);
+    const clientSocket = this.getClientSocketInRoom(this._userSocketIdMap[userId]);
+    clientSocket.emit('GE_NEW_WORD', word);
   }
 
   broadcastRoomState(eventName, args) {

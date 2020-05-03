@@ -21,14 +21,14 @@ class Looper {
     this._roomEventBridge.broadcastRoomState('GE_IDLE');
   }
 
-  addUser(dbUser, socket) {
+  addUser(dbUser, socketId) {
     const foundUser = this._users.find((user) => dbUser.id === user.id);
     if (!foundUser) {
       this._users.push(dbUser);
     } else {
       console.log('user already in room');
     }
-    this._roomEventBridge.updateUserSocket(dbUser.id, socket);
+    this._roomEventBridge.updateUserSocket(dbUser.id, socketId);
     debug('Added new user - ', dbUser);
   }
 

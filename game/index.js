@@ -14,7 +14,7 @@ exports.addNewRoom = async (name) => {
 exports.setSocketHandle = (io) => (_io = io);
 
 //user - user.id, user.socket
-exports.addNewUser = async (userId, userSocket, room) => {
+exports.addNewUser = async (userId, userSocketId, room) => {
   try {
     if (!_rooms.includes(room)) throw new Error('No such room');
 
@@ -22,12 +22,12 @@ exports.addNewUser = async (userId, userSocket, room) => {
     if (dbUser) {
       const looper = _roomLoopMap[room];
       if (looper) {
-        await looper.addUser(dbUser, userSocket);
+        await looper.addUser(dbUser, userSocketId);
         debug('Added user to room');
       } else {
-        const roomEventBridge = new RoomEventBridge(_io);
+        const roomEventBridge = new RoomEventBridge(_io, room);
         const looper = new Looper(room, roomEventBridge);
-        await looper.addUser(dbUser, userSocket);
+        await looper.addUser(dbUser, userSocketId);
         _roomLoopMap[room] = looper;
         debug('Created Looper and add user to room');
       }

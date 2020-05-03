@@ -3,7 +3,9 @@ const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 const datastore = require('./datastore');
 const game = require('./game');
-const debug = require('debug')('server');
+const debug = require('debug')('pictionary.server');
+
+const DEFAULT_ROOM = 'main';
 
 game.setSocketHandle(io);
 
@@ -21,12 +23,16 @@ io.on('connection', (socket) => {
     clearInterval(interval);
   });
   
-  socket.on('C_S_LOGIN', async (user) => {
+  socket.on('C_S_LOGIN', async (user, room) => {
     try {
       // log in the user
       const loginResult = await datastore.login(user);
+
+      // Join the socket to the room
+      socket.join(room || DEFAULT_ROOM);
+
       // automatically add the user to the default room
-      await game.addNewUser(user.id, socket, 'main');
+      await game.addNewUser(user.id, socket.id, room || DEFAULT_ROOM);
 
       socket.emit('S_C_LOGIN', loginResult);
 
