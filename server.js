@@ -1,21 +1,26 @@
-var app = require('express')();
-var http = require('http').createServer(app);
-var io = require('socket.io')(http);
-var datastore = require('./datastore/index');
-var game = require('./game/index');
+const app = require('express')();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
+const datastore = require('./datastore');
+const game = require('./game');
+const debug = require('debug')('server');
+
+game.setSocketHandle(io);
 
 app.get('/', (req, res) => {
   res.send('<h1>Hello world</h1>');
 });
 
-game.setSocketHandle(io);
-
 io.on('connection', (socket) => {
-  console.log('A user just connected');
+  
+  debug('A user connected');
+  
   let interval = setInterval(() => updateServerTime(socket), 1000);
+  
   socket.on('disconnect', () => {
     clearInterval(interval);
   });
+  
   socket.on('C_S_LOGIN', async (user) => {
     try {
       // log in the user
@@ -24,11 +29,15 @@ io.on('connection', (socket) => {
       await game.addNewUser(user.id, socket, 'main');
 
       socket.emit('S_C_LOGIN', loginResult);
+
     } catch (error) {
-      console.log('Error Logging in - ', error);
+
+      debug('Error Logging in - ', error);
       socket.disconnect();
+
     }
   });
+
 });
 
 const updateServerTime = (socket) => {
@@ -36,5 +45,5 @@ const updateServerTime = (socket) => {
 };
 
 http.listen(3001, () => {
-  console.log('listening on *:3001');
+  debug('listening on *:3001');
 });
