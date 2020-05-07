@@ -19,21 +19,49 @@ class Looper {
     this._currentUserDrawIndex = 0;
     this._roomEventBridge = roomEventBridge;
     this._roomEventBridge.broadcastRoomState('GE_IDLE');
+    this._roomEventBridge.on('GE_NEW_GUESS', (userId, guess) => {
+      this.evaluateGuess(userId, guess);
+    });
+    this._roomEventBridge.on('C_S_LEAVE_ROOM', (userId) => {
+      this.removeUser(userId);
+    });
+  }
+
+  getEventBridge() {
+    return this._roomEventBridge;
   }
 
   addUser(dbUser, socketId) {
     const foundUser = this._users.find((user) => dbUser.id === user.id);
     if (!foundUser) {
-      this._users.push(dbUser);
+      this._users.push({ id: dbUser.id, points: 0 });
     } else {
       console.log('user already in room');
     }
     this._roomEventBridge.updateUserSocket(dbUser.id, socketId);
+    this._roomEventBridge.broadcastScores(this._users);
     debug('Added new user - ', dbUser);
   }
 
-  removeUser(dbUser) {
+  removeUser(userId) {
     // remove from _users
+    const indexOfUser = this._users.map((user) => user.id).indexOf(userId);
+    if (indexOfUser >= 0) {
+      this._users.splice(indexOfUser, 1);
+      this._roomEventBridge.broadcastScores(this._users);
+    }
+  }
+
+  evaluateGuess(userId, guess) {
+    if (!guess) return;
+    if (guess.trim().toLowerCase() === this._currentWord.trim().toLowerCase()) {
+      debug('Correct guess by user - ', userId);
+      const foundUser = this._users.find((user) => userId === user.id);
+      if (foundUser) {
+        foundUser.points += 10;
+        this._roomEventBridge.broadcastScores(this._users);
+      }
+    }
   }
 
   evaluateRound() {

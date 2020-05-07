@@ -22,6 +22,7 @@ exports.addNewUser = async (userId, userSocketId, room) => {
     if (dbUser) {
       const looper = _roomLoopMap[room];
       if (looper) {
+        looper.getEventBridge().setIO(_io);
         await looper.addUser(dbUser, userSocketId);
         debug('Added user to room');
       } else {

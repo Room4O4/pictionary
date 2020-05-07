@@ -12,14 +12,19 @@ const Canvas = ({ io }) => {
 
     if (io) {
       io.on("S_C_DRAW", onDrawingEvent);
+      io.on("GE_NEW_ROUND", (roundNumber, totalRounds) => {
+        const context = canvasRef.current.getContext('2d');
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);      
+      });
     }
   });
 
   // make the canvas fill its parent
   function onResize() {
-    //canvasRef.current.width = window.innerWidth;
-    //canvasRef.current.height = window.innerHeight;
+    canvasRef.current.width = window.innerWidth;
+    canvasRef.current.height = window.innerHeight;
   }
+
   function drawLine(x0, y0, x1, y1, color, emit) {
     const context = canvasRef.current.getContext("2d");
     context.beginPath();
