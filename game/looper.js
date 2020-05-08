@@ -5,7 +5,8 @@ class Looper {
     this.ROUND_DURATION = 10000;
     this.GAME_STATE_IDLE = 0;
     this.GAME_STATE_ROUND_IN_PROGRESS = 1;
-    this.GAME_STATE_ANNOUNCE_WINNER = 2;
+    this.GAME_STATE_WAIT_FOR_NEXT_ROUND = 2;
+    this.GAME_STATE_ANNOUNCE_WINNER = 3;
 
     this._gameStarted = false;
     this._roundStarted = false;
@@ -68,7 +69,7 @@ class Looper {
     // At the end of round, do _rounds--
     // Repeat till _rounds == 0
     this._roundsLeft--;
-    if (this._roundsLeft == 0) {
+    if (this._roundsLeft <= 0) {
       // Game over
       // emit game over
       this._gameStarted = false;
@@ -76,7 +77,12 @@ class Looper {
       debug('Game over, Announce winner');
       // announce winners
     } else {
-      this.startRound();
+      this._gameState = this.GAME_STATE_WAIT_FOR_NEXT_ROUND;
+      this._roomEventBridge.broadcastRoomState('GE_WAIT_FOR_NEXT_ROUND', this._currentWord);
+      const that = this;
+      setTimeout(() => {
+        that.startRound();
+      }, 5000);
     }
   }
 
@@ -94,7 +100,7 @@ class Looper {
     debug('Current User Drawing - ', currentDrawingUser);
 
     // emit round started
-    this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', this._roundsLeft, this._totalRounds);
+    this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', { round: this._roundsLeft, total: this._totalRounds });
     this._roomEventBridge.sendWordToPlayer(currentDrawingUser.id, this._currentWord);
 
     // Assign other users to guess
@@ -115,7 +121,7 @@ class Looper {
     const that = this;
     setTimeout(() => {
       that._gameState = that.GAME_STATE_IDLE;
-      this._winnerAnnouncementInProgress = false;
+      that._winnerAnnouncementInProgress = false;
     }, 10 * 1000);
   }
 

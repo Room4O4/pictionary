@@ -17,6 +17,7 @@ function App() {
   const [guess, setGuess] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [userScores, setUserScores] = useState(null);
+  const [previousWord, setPreviousWord] = useState(null);
 
   useEffect(() => {
     const io = socket('http://localhost:3001');
@@ -35,11 +36,15 @@ function App() {
         console.log('New Game starting...');
       });
 
-      io.on('GE_NEW_ROUND', (roundNumber, totalRounds) => {
+      io.on('GE_NEW_ROUND', ({ round, total }) => {
         setDrawWord(null);
         setGuess('');
         setShowGuessBox(true);
-        console.log(`New Round starting, Round: ${roundNumber}, Total: ${totalRounds}`);
+        console.log(`New Round starting, Round: ${round}, Total: ${total}`);
+      });
+
+      io.on('GE_WAIT_FOR_NEXT_ROUND', (previousWord) => {
+        setPreviousWord(previousWord);
       });
 
       io.on('GE_ANNOUNCE_WINNER', () => {
@@ -118,6 +123,11 @@ function App() {
               <Typography variant="h3">{drawWord}</Typography>
             )}
           </Grid>
+          {previousWord ? (
+            <Grid item xs={12}>
+              <Typography variant="body1">Previous word was {previousWord}</Typography>
+            </Grid>
+          ) : null}
         </Grid>
       </Grid>
     </div>

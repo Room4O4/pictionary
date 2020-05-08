@@ -27,6 +27,10 @@ class RoomEventBridge extends EventEmitter {
     return null;
   }
 
+  _getUser(socketId) {
+    return Object.keys(this._userSocketIdMap).find((key) => this._userSocketIdMap[key] === socketId);
+  }
+
   // Add socket, or update socket when there is a reconnection?
   updateUserSocket(userId, socketId) {
     this._userSocketIdMap[userId] = socketId;
@@ -39,8 +43,9 @@ class RoomEventBridge extends EventEmitter {
 
       clientSocket.on('disconnect', (args) => {
         debug('User disconnected');
-        delete this._userSocketIdMap[args.userId];
-        this.emit('C_S_LEAVE_ROOM', args.userId);
+        const userId = this._getUser(clientSocket.id);
+        delete this._userSocketIdMap[clientSocket.id];
+        this.emit('C_S_LEAVE_ROOM', userId);
       });
 
       clientSocket.on('C_S_DRAW', (data) => {
@@ -68,7 +73,7 @@ class RoomEventBridge extends EventEmitter {
         this._io.emit('GE_NEW_GAME');
         break;
       case 'GE_NEW_ROUND':
-        this._io.emit('GE_NEW_ROUND');
+        this._io.emit('GE_NEW_ROUND', args);
         break;
       case 'GE_ANNOUNCE_WINNER':
         this._io.emit('GE_ANNOUNCE_WINNER');
