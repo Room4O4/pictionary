@@ -2,7 +2,7 @@ const debug = require('debug')('pictionary.game.looper');
 
 class Looper {
   constructor(room, roomEventBridge) {
-    this.ROUND_DURATION = 10000;
+    this.ROUND_DURATION = 30000;
     this.GAME_STATE_IDLE = 0;
     this.GAME_STATE_ROUND_IN_PROGRESS = 1;
     this.GAME_STATE_WAIT_FOR_NEXT_ROUND = 2;
@@ -140,7 +140,7 @@ class Looper {
         if (this._users.length > 1) {
           this._gameState = this.GAME_STATE_ROUND_IN_PROGRESS;
           this._resetScores();
-          this._roomEventBridge.broadcastRoomState('GE_NEW_GAME');
+          this._roomEventBridge.broadcastRoomState('GE_NEW_GAME', this.ROUND_DURATION);
           this._roomEventBridge.broadcastScores(this._users);
           this._roundsLeft = this._users.length;
           this._totalRounds = this._users.length;

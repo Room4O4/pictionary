@@ -9,6 +9,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
+import ReactCountdownClock from 'react-countdown-clock';
 
 function App() {
   const [socketIO, setSocketIO] = useState(null);
@@ -21,8 +22,15 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [userScores, setUserScores] = useState(null);
   const [previousWord, setPreviousWord] = useState(null);
-
   const guessBoxRef = useRef(null);
+  const [roundDuration, setRoundDuration] = useState(0);
+
+  const GAME_STATE_IDLE = 0;
+  const GAME_STATE_NEW_GAME = 1;
+  const GAME_STATE_NEW_ROUND = 2;
+  const GAME_STATE_WAIT_FOR_NEXT_ROUND = 3;
+  const GAME_STATE_ANNOUNCE_WINNER = 4;
+  const [gameState, setGameState] = useState(GAME_STATE_IDLE);
 
   useEffect(() => {
     if (guessBoxRef && guessBoxRef.current) guessBoxRef.current.focus();
@@ -42,9 +50,11 @@ function App() {
         setCurrentUser(user);
       });
 
-      io.on('GE_NEW_GAME', () => {
+      io.on('GE_NEW_GAME', (roundDuration) => {
         console.log('New Game starting...');
+        setRoundDuration(roundDuration / 1000);
         setCurrentUser({ ...user, score: 0 });
+        setGameState(GAME_STATE_NEW_GAME);
       });
 
       io.on('GE_NEW_ROUND', ({ round, total }) => {
@@ -53,6 +63,7 @@ function App() {
         setShowGuessBox(true);
         setEnableGuessBox(true);
         setPreviousWord(null);
+        setGameState(GAME_STATE_NEW_ROUND);
         console.log(`New Round starting, Round: ${round}, Total: ${total}`);
       });
 
@@ -60,6 +71,7 @@ function App() {
         setShowGuessBox(false);
         setDrawWord(null);
         setPreviousWord(previousWord);
+        setGameState(GAME_STATE_WAIT_FOR_NEXT_ROUND);
       });
 
       io.on('GE_ANNOUNCE_WINNER', () => {
@@ -68,6 +80,7 @@ function App() {
         console.log(`Announce Winner`);
         setShowGuessBox(false);
         setDrawWord(null);
+        setGameState(GAME_STATE_ANNOUNCE_WINNER);
       });
 
       io.on('GE_NEW_WORD', (word) => {
@@ -99,7 +112,6 @@ function App() {
   const guessBoxPressed = (e) => {
     if (e.keyCode === 13) {
       //Enter pressed. send it to server
-
       setGuess('');
       console.log('New guess -', currentUser.id, e.target.value);
       socketIO.emit('GE_NEW_GUESS', {
@@ -141,10 +153,15 @@ function App() {
           </List>
         </Grid>
         <Grid item xs={9}>
-          <Grid item xs={12}>
+          <Grid item xs={12} className="canvasContainer">
             <Canvas io={socketIO} />
+            {gameState === GAME_STATE_NEW_ROUND ? (
+              <div className="timer">
+                <ReactCountdownClock className="timer" seconds={roundDuration} color="#000" alpha={0.9} size={60} />{' '}
+              </div>
+            ) : null}
           </Grid>
-          <Grid item xs={12}>
+          <Grid item xs={12} className="inputContainer">
             {showGuessBox ? (
               <TextField
                 className="guessBox"
