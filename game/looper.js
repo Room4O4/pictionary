@@ -8,7 +8,6 @@ class Looper {
     this.GAME_STATE_WAIT_FOR_NEXT_ROUND = 2;
     this.GAME_STATE_ANNOUNCE_WINNER = 3;
 
-    this._gameStarted = false;
     this._roundStarted = false;
     this._roundsLeft = 0;
     this._totalRounds = 0;
@@ -68,16 +67,21 @@ class Looper {
     if (this._roundsLeft <= 0) {
       // Game over
       // emit game over
-      this._gameStarted = false;
-      this._gameState = this.GAME_STATE_ANNOUNCE_WINNER;
-      debug('Game over, Announce winner');
+      this.stopGame();
       // announce winners
     } else {
       this._gameState = this.GAME_STATE_WAIT_FOR_NEXT_ROUND;
       this._roomEventBridge.broadcastRoomState('GE_WAIT_FOR_NEXT_ROUND', this._currentWord);
       const that = this;
       setTimeout(() => {
-        that.startRound();
+        debug('Users count', that._users.length);
+        if(that._users.length > 1){
+          that.startRound();
+        } else {
+          // Users have left before the next round starts.
+          // Stop the game and Announce winner
+          that.stopGame();
+        }
       }, 5000);
     }
   }
@@ -114,6 +118,12 @@ class Looper {
       user.score = 0;
     });
   }
+
+  stopGame() {
+    this._gameState = this.GAME_STATE_ANNOUNCE_WINNER;
+    debug('Game over, Announce winner');
+  }
+
   announceWinner() {
     debug('Winner announced!');
     this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER');
@@ -145,7 +155,7 @@ class Looper {
         break;
       case this.GAME_STATE_ROUND_IN_PROGRESS:
         if (this._users.length < 2) {
-          this._gameState = this.GAME_STATE_ANNOUNCE_WINNER;
+          this.stopGame();
         }
         break;
       case this.GAME_STATE_ANNOUNCE_WINNER:
