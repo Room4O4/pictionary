@@ -9,11 +9,7 @@ class RoomEventBridge extends EventEmitter {
     this._room = room;
   }
 
-  setIO(io) {
-    this._io = io;
-  }
-
-  getClientSocketInRoom(socketId) {
+  _getClientSocketInRoom(socketId) {
     if (!this._io || !this._io.sockets.adapter.rooms[this._room]) return null;
 
     const clients = this._io.sockets.adapter.rooms[this._room].sockets;
@@ -34,7 +30,7 @@ class RoomEventBridge extends EventEmitter {
   // Add socket, or update socket when there is a reconnection?
   updateUserSocket(userId, socketId) {
     this._userSocketIdMap[userId] = socketId;
-    let clientSocket = this.getClientSocketInRoom(socketId);
+    let clientSocket = this._getClientSocketInRoom(socketId);
     debug('Client socket found', clientSocket.id);
     if (clientSocket) {
       clientSocket.on('GE_NEW_GUESS', (args) => {
@@ -62,7 +58,7 @@ class RoomEventBridge extends EventEmitter {
 
   sendWordToPlayer(userId, word) {
     debug('send word to player: ', userId, word);
-    const clientSocket = this.getClientSocketInRoom(this._userSocketIdMap[userId]);
+    const clientSocket = this._getClientSocketInRoom(this._userSocketIdMap[userId]);
     if (clientSocket) clientSocket.emit('GE_NEW_WORD', word);
   }
 
