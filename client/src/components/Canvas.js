@@ -1,23 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./canvas.css";
+import React, { useState, useEffect, useRef } from 'react';
+import './canvas.css';
 
 const Canvas = ({ io }) => {
   let drawing = false;
   let current = { x: 0, y: 0 };
-  const canvasRef = useRef(null);
+  let canvasRef = useRef(null);
 
   useEffect(() => {
-    window.addEventListener("resize", onResize, false);
+    window.addEventListener('resize', onResize, false);
     onResize();
 
     if (io) {
-      io.on("S_C_DRAW", onDrawingEvent);
-      io.on("GE_NEW_ROUND", (roundNumber, totalRounds) => {
+      io.on('S_C_DRAW', onDrawingEvent);
+      io.on('GE_NEW_ROUND', (roundNumber, totalRounds) => {
         const context = canvasRef.current.getContext('2d');
-        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);      
+        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       });
     }
-  });
+  }, []);
 
   // make the canvas fill its parent
   function onResize() {
@@ -26,12 +26,12 @@ const Canvas = ({ io }) => {
   }
 
   function drawLine(x0, y0, x1, y1, color, emit) {
-    const context = canvasRef.current.getContext("2d");
+    const context = canvasRef.current.getContext('2d');
     context.beginPath();
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
     context.strokeStyle = color;
-    context.lineWidth = 2;
+    context.lineWidth = 4;
     context.stroke();
     context.closePath();
 
@@ -41,7 +41,7 @@ const Canvas = ({ io }) => {
     var w = canvasRef.current.width;
     var h = canvasRef.current.height;
 
-    io.emit("C_S_DRAW", {
+    io.emit('C_S_DRAW', {
       x0: x0 / w,
       y0: y0 / h,
       x1: x1 / w,
@@ -71,14 +71,7 @@ const Canvas = ({ io }) => {
     const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
     var x = (e.clientX - rect.left) * scaleX; //x position within the element.
     var y = (e.clientY - rect.top) * scaleY; //y position within the element.
-    drawLine(
-      current.x,
-      current.y,
-      x || e.touches[0].clientX,
-      y || e.touches[0].clientY,
-      current.color,
-      true
-    );
+    drawLine(current.x, current.y, x || e.touches[0].clientX, y || e.touches[0].clientY, current.color, true);
   }
 
   function onMouseMove(e) {
@@ -91,14 +84,7 @@ const Canvas = ({ io }) => {
     var x = (e.clientX - rect.left) * scaleX; //x position within the element.
     var y = (e.clientY - rect.top) * scaleY; //y position within the element.
 
-    drawLine(
-      current.x,
-      current.y,
-      x || e.touches[0].clientX,
-      y || e.touches[0].clientY,
-      current.color,
-      true
-    );
+    drawLine(current.x, current.y, x || e.touches[0].clientX, y || e.touches[0].clientY, current.color, true);
     current.x = x || e.touches[0].clientX;
     current.y = y || e.touches[0].clientY;
   }
