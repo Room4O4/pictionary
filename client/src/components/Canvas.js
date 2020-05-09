@@ -7,9 +7,6 @@ const Canvas = ({ io }) => {
   let canvasRef = useRef(null);
 
   useEffect(() => {
-    window.addEventListener('resize', onResize, false);
-    onResize();
-
     if (io) {
       io.on('S_C_DRAW', onDrawingEvent);
       io.on('GE_NEW_ROUND', (roundNumber, totalRounds) => {
@@ -17,6 +14,11 @@ const Canvas = ({ io }) => {
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       });
     }
+  });
+
+  useEffect(() => {
+    window.addEventListener('resize', onResize, false);
+    onResize();
   }, []);
 
   // make the canvas fill its parent
@@ -54,11 +56,14 @@ const Canvas = ({ io }) => {
     var rect = e.target.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
     const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
-    var x = (e.clientX - rect.left) * scaleX; //x position within the element.
-    var y = (e.clientY - rect.top) * scaleY; //y position within the element.
+    const inputX = e.clientX || e.touches[0].clientX;
+    const inputY = e.clientY || e.touches[0].clientY;
+
+    var x = (inputX - rect.left) * scaleX; //x position within the element.
+    var y = (inputY - rect.top) * scaleY; //y position within the element.
     drawing = true;
-    current.x = x || e.touches[0].clientX;
-    current.y = y || e.touches[0].clientY;
+    current.x = x;
+    current.y = y;
   }
 
   function onMouseUp(e) {
@@ -66,12 +71,19 @@ const Canvas = ({ io }) => {
       return;
     }
     drawing = false;
+    if (!e || e.touches) {
+      return;
+    }
+
     var rect = e.target.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
     const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
-    var x = (e.clientX - rect.left) * scaleX; //x position within the element.
-    var y = (e.clientY - rect.top) * scaleY; //y position within the element.
-    drawLine(current.x, current.y, x || e.touches[0].clientX, y || e.touches[0].clientY, current.color, true);
+    const inputX = e.clientX || e.touches[0].clientX;
+    const inputY = e.clientY || e.touches[0].clientY;
+
+    var x = (inputX - rect.left) * scaleX; //x position within the element.
+    var y = (inputY - rect.top) * scaleY; //y position within the element.
+    drawLine(current.x, current.y, x, y, current.color, true);
   }
 
   function onMouseMove(e) {
@@ -81,12 +93,14 @@ const Canvas = ({ io }) => {
     var rect = e.target.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
     const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
-    var x = (e.clientX - rect.left) * scaleX; //x position within the element.
-    var y = (e.clientY - rect.top) * scaleY; //y position within the element.
+    const inputX = e.clientX || e.touches[0].clientX;
+    const inputY = e.clientY || e.touches[0].clientY;
+    var x = (inputX - rect.left) * scaleX; //x position within the element.
+    var y = (inputY - rect.top) * scaleY; //y position within the element.
 
-    drawLine(current.x, current.y, x || e.touches[0].clientX, y || e.touches[0].clientY, current.color, true);
-    current.x = x || e.touches[0].clientX;
-    current.y = y || e.touches[0].clientY;
+    drawLine(current.x, current.y, x, y, current.color, true);
+    current.x = x;
+    current.y = y;
   }
 
   // limit the number of events per second
@@ -114,7 +128,11 @@ const Canvas = ({ io }) => {
       onMouseDown={(e) => onMouseDown(e)}
       onMouseUp={(e) => onMouseUp(e)}
       onMouseOut={(e) => onMouseUp(e)}
-      onMouseMove={(e) => throttle(onMouseMove(e))}
+      onMouseMove={(e) => throttle(onMouseMove(e), 10)}
+      onTouchStart={(e) => onMouseDown(e)}
+      onTouchEnd={(e) => onMouseUp(e)}
+      onTouchCancel={(e) => onMouseUp(e)}
+      onTouchMove={(e) => throttle(onMouseMove(e), 10)}
       ref={canvasRef}
     />
   );
