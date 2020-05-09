@@ -51,14 +51,19 @@ function App() {
         setGuess('');
         setShowGuessBox(true);
         setEnableGuessBox(true);
+        setPreviousWord(null);
         console.log(`New Round starting, Round: ${round}, Total: ${total}`);
       });
 
       io.on('GE_WAIT_FOR_NEXT_ROUND', (previousWord) => {
+        setShowGuessBox(false);
+        setDrawWord(null);
         setPreviousWord(previousWord);
       });
 
       io.on('GE_ANNOUNCE_WINNER', () => {
+        setShowGuessBox(false);
+        setDrawWord(null);
         console.log(`Announce Winner`);
         setShowGuessBox(false);
         setDrawWord(null);
@@ -90,7 +95,10 @@ function App() {
       //Enter pressed. send it to server
       setGuess('');
       console.log('New guess -', e.target.value);
-      socketIO.emit('GE_NEW_GUESS', { userId: currentUser.id, guess: e.target.value });
+      socketIO.emit('GE_NEW_GUESS', {
+        userId: currentUser.id,
+        guess: e.target.value,
+      });
     }
   };
 
