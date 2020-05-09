@@ -1,4 +1,5 @@
 const debug = require('debug')('pictionary.game.looper');
+const picWordGenerator = require('pic-word-gen');
 
 class Looper {
   constructor(room, roomEventBridge) {
@@ -99,8 +100,8 @@ class Looper {
       return;
     }
 
-    // Pick a word from dictionary
-    this._currentWord = 'BANANA';
+    // Pick a word using pic-word-gen library
+    this._currentWord = picWordGenerator.generateWord();
 
     // emit round started
     this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', { round: this._roundsLeft, total: this._totalRounds });
