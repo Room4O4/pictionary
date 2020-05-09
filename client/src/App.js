@@ -44,6 +44,7 @@ function App() {
 
       io.on('GE_NEW_GAME', () => {
         console.log('New Game starting...');
+        setCurrentUser({ ...user, score: 0 });
       });
 
       io.on('GE_NEW_ROUND', ({ round, total }) => {
@@ -77,24 +78,30 @@ function App() {
       io.on('GE_UPDATE_SCORE', (userScores) => {
         console.table(userScores);
         setUserScores(userScores);
-        //disable guess box if guess is right
-        if (currentUser) {
-          const latestUserScore = userScores.find((user) => user.id === currentUser.id).score;
-          if (latestUserScore > currentUser.score) {
-            setEnableGuessBox(false);
-            currentUser.score = latestUserScore;
-          }
-        }
       });
     });
     setSocketIO(io);
   }, []);
 
+  useEffect(() => {
+    if (userScores && currentUser) {
+      console.log(currentUser);
+      const latestUserScore = userScores.find((user) => user.id === currentUser.id).score;
+      if (latestUserScore > currentUser.score) {
+        console.log('Disable guess box');
+        //disable guess box if guess is right
+        setEnableGuessBox(false);
+        currentUser.score = latestUserScore;
+      }
+    }
+  }, [userScores]);
+
   const guessBoxPressed = (e) => {
     if (e.keyCode === 13) {
       //Enter pressed. send it to server
+
       setGuess('');
-      console.log('New guess -', e.target.value);
+      console.log('New guess -', currentUser.id, e.target.value);
       socketIO.emit('GE_NEW_GUESS', {
         userId: currentUser.id,
         guess: e.target.value,

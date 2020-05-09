@@ -88,16 +88,19 @@ class Looper {
 
   startRound() {
     debug('start new round');
-
     this._roundStarted = true;
-    // Pick a word from dictionary
-    this._currentWord = 'BANANA';
-
     // Assign a user to draw
-
     this._currentUserDrawIndex = (this._totalRounds - this._roundsLeft) % this._users.length;
     const currentDrawingUser = this._users[this._currentUserDrawIndex];
     debug('Current User Drawing - ', currentDrawingUser);
+    // Sometimes the currentDrawing user quits while its his turn to draw. SKIP the round!
+    if (!currentDrawingUser) {
+      this.evaluateRound();
+      return;
+    }
+
+    // Pick a word from dictionary
+    this._currentWord = 'BANANA';
 
     // emit round started
     this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', { round: this._roundsLeft, total: this._totalRounds });
@@ -110,6 +113,11 @@ class Looper {
     setTimeout(() => that.evaluateRound(), this.ROUND_DURATION);
   }
 
+  _resetScores() {
+    this._users.forEach((user) => {
+      user.score = 0;
+    });
+  }
   announceWinner() {
     debug('Winner announced!');
     this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER');
@@ -131,7 +139,9 @@ class Looper {
       case this.GAME_STATE_IDLE:
         if (this._users.length > 1) {
           this._gameState = this.GAME_STATE_ROUND_IN_PROGRESS;
+          this._resetScores();
           this._roomEventBridge.broadcastRoomState('GE_NEW_GAME');
+          this._roomEventBridge.broadcastScores(this._users);
           this._roundsLeft = this._users.length;
           this._totalRounds = this._users.length;
           this.startRound();
