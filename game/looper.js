@@ -28,10 +28,6 @@ class Looper {
     });
   }
 
-  getEventBridge() {
-    return this._roomEventBridge;
-  }
-
   addUser(dbUser, socketId) {
     const foundUser = this._users.find((user) => dbUser.id === user.id);
     if (!foundUser) {
@@ -103,7 +99,7 @@ class Looper {
     this._currentWord = 'BANANA';
 
     // emit round started
-    this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', { round: this._roundsLeft, total: this._totalRounds });
+    this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', { round: this._roundsLeft, total: this._totalRounds, currentDrawingUser });
     this._roomEventBridge.sendWordToPlayer(currentDrawingUser.id, this._currentWord);
 
     // Assign other users to guess
