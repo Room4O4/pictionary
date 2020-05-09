@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import socket from 'socket.io-client';
@@ -13,11 +13,20 @@ import Typography from '@material-ui/core/Typography';
 function App() {
   const [socketIO, setSocketIO] = useState(null);
   const [drawWord, setDrawWord] = useState(null);
+
   const [showGuessBox, setShowGuessBox] = useState(false);
+  const [enableGuessBox, setEnableGuessBox] = useState(false);
+
   const [guess, setGuess] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [userScores, setUserScores] = useState(null);
   const [previousWord, setPreviousWord] = useState(null);
+
+  const guessBoxRef = useRef(null);
+
+  useEffect(() => {
+    if (guessBoxRef && guessBoxRef.current) guessBoxRef.current.focus();
+  }, [showGuessBox]);
 
   useEffect(() => {
     const io = socket('http://localhost:3001');
@@ -25,6 +34,7 @@ function App() {
       const user = {
         id: `player${+new Date()}`,
         name: 'Player',
+        score: 0,
       };
       io.emit('C_S_LOGIN', user);
       io.on('S_C_LOGIN', () => {
@@ -40,6 +50,7 @@ function App() {
         setDrawWord(null);
         setGuess('');
         setShowGuessBox(true);
+        setEnableGuessBox(true);
         console.log(`New Round starting, Round: ${round}, Total: ${total}`);
       });
 
@@ -49,6 +60,8 @@ function App() {
 
       io.on('GE_ANNOUNCE_WINNER', () => {
         console.log(`Announce Winner`);
+        setShowGuessBox(false);
+        setDrawWord(null);
       });
 
       io.on('GE_NEW_WORD', (word) => {
@@ -57,8 +70,16 @@ function App() {
       });
 
       io.on('GE_UPDATE_SCORE', (userScores) => {
-        setUserScores(userScores);
         console.table(userScores);
+        setUserScores(userScores);
+        //disable guess box if guess is right
+        if (currentUser) {
+          const latestUserScore = userScores.find((user) => user.id === currentUser.id).score;
+          if (latestUserScore > currentUser.score) {
+            setEnableGuessBox(false);
+            currentUser.score = latestUserScore;
+          }
+        }
       });
     });
     setSocketIO(io);
@@ -86,7 +107,7 @@ function App() {
 
           <ListItemText>
             <Typography variant="body1" className="userScoreListItemPoints">
-              {userScore.points}
+              {userScore.score}
             </Typography>
           </ListItemText>
         </ListItem>
@@ -104,7 +125,7 @@ function App() {
             {buildUserList()}
           </List>
         </Grid>
-        <Grid item xs={9} container>
+        <Grid item xs={9}>
           <Grid item xs={12}>
             <Canvas io={socketIO} />
           </Grid>
@@ -113,6 +134,8 @@ function App() {
               <TextField
                 className="guessBox"
                 id="txt-guess"
+                ref={guessBoxRef}
+                disabled={!enableGuessBox}
                 label="Guess!"
                 value={guess}
                 variant="outlined"

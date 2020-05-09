@@ -35,7 +35,7 @@ class Looper {
   addUser(dbUser, socketId) {
     const foundUser = this._users.find((user) => dbUser.id === user.id);
     if (!foundUser) {
-      this._users.push({ id: dbUser.id, points: 0 });
+      this._users.push({ id: dbUser.id, score: 0 });
     } else {
       console.log('user already in room');
     }
@@ -59,7 +59,7 @@ class Looper {
       debug('Correct guess by user - ', userId);
       const foundUser = this._users.find((user) => userId === user.id);
       if (foundUser) {
-        foundUser.points += 10;
+        foundUser.score += 10;
         this._roomEventBridge.broadcastScores(this._users);
       }
     }
