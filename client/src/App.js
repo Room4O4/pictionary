@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import socket from 'socket.io-client';
 import Canvas from './components/Canvas';
@@ -8,6 +7,8 @@ import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import Avatar from 'react-avatar';
 import Typography from '@material-ui/core/Typography';
 import ReactCountdownClock from 'react-countdown-clock';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
@@ -133,12 +134,14 @@ function App() {
     const renderUsers = userScores.map((userScore) => {
       return (
         <ListItem id={userScore.id} className="userScoreListItem">
+          <ListItemAvatar>
+            <Avatar name={userScore.name} round={true} size="30" textSizeRatio={1.75} />
+          </ListItemAvatar>
           <ListItemText>
             <Typography variant="body1" className="userScoreListItemId">
               {userScore.name}
             </Typography>
           </ListItemText>
-
           <ListItemText>
             <Typography variant="body1" className="userScoreListItemPoints">
               {userScore.score}
