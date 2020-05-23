@@ -37,6 +37,10 @@ function App() {
   }, [showGuessBox]);
 
   useEffect(() => {
+    document.body.addEventListener('touchmove', function(e){ e.preventDefault(); });
+  }, []);
+  
+  useEffect(() => {
     const io = socket('http://192.168.1.5:3001');
     io.on('connect', () => {
       const user = {
