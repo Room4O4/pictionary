@@ -37,10 +37,6 @@ function App() {
   }, [showGuessBox]);
 
   useEffect(() => {
-    document.body.addEventListener('touchmove', function(e){ e.preventDefault(); });
-  }, []);
-  
-  useEffect(() => {
     const io = socket('http://localhost:3001');
     io.on('connect', () => {
       const user = {
@@ -146,6 +142,12 @@ function App() {
     });
     return renderUsers;
   };
+
+  useEffect(() => {
+    document.body.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+    });
+  }, []);
 
   return (
     <div className="App">
