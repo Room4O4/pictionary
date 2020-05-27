@@ -41,7 +41,7 @@ function App() {
   }, [showGuessBox]);
 
   useEffect(() => {
-    if(playerNickname){
+    if (playerNickname) {
       const io = socket('http://localhost:3001');
       io.on('connect', () => {
         const user = {
@@ -54,14 +54,14 @@ function App() {
           console.log('Login success');
           setCurrentUser(user);
         });
-  
+
         io.on('GE_NEW_GAME', (roundDuration) => {
           console.log('New Game starting...');
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
           setGameState(GAME_STATE_NEW_GAME);
         });
-  
+
         io.on('GE_NEW_ROUND', ({ round, total }) => {
           setDrawWord(null);
           setGuess('');
@@ -71,14 +71,14 @@ function App() {
           setGameState(GAME_STATE_NEW_ROUND);
           console.log(`New Round starting, Round: ${round}, Total: ${total}`);
         });
-  
+
         io.on('GE_WAIT_FOR_NEXT_ROUND', (previousWord) => {
           setShowGuessBox(false);
           setDrawWord(null);
           setPreviousWord(previousWord);
           setGameState(GAME_STATE_WAIT_FOR_NEXT_ROUND);
         });
-  
+
         io.on('GE_ANNOUNCE_WINNER', () => {
           setShowGuessBox(false);
           setDrawWord(null);
@@ -87,12 +87,12 @@ function App() {
           setDrawWord(null);
           setGameState(GAME_STATE_ANNOUNCE_WINNER);
         });
-  
+
         io.on('GE_NEW_WORD', (word) => {
           setDrawWord(word);
           setShowGuessBox(false);
         });
-  
+
         io.on('GE_UPDATE_SCORE', (userScores) => {
           console.table(userScores);
           setUserScores(userScores);
@@ -102,7 +102,7 @@ function App() {
     } else {
       console.log('playerNickname is null');
     }
-  },[playerNickname]);
+  }, [playerNickname]);
 
   useEffect(() => {
     if (userScores && currentUser) {
@@ -153,9 +153,14 @@ function App() {
     return renderUsers;
   };
 
+  useEffect(() => {
+    document.body.addEventListener('touchmove', function (e) {
+      e.preventDefault();
+    });
+  }, []);
   const onNicknameAdded = (nickname) => {
     setPlayerNickname(nickname);
-  }
+  };
 
   return (
     <div className="App">
@@ -199,9 +204,7 @@ function App() {
           ) : null}
         </Grid>
       </Grid>
-      { !playerNickname && (
-          <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-        )}
+      {!playerNickname && <AddNicknameDialog onNicknameAdded={onNicknameAdded} />}
     </div>
   );
 }
