@@ -38,7 +38,7 @@
 }
 
 .layoutContainer {
-  width: 'auto';
+  width: "auto";
   max-height: 100vh;
 }
 
@@ -59,6 +59,8 @@
 }
 .canvasContainer {
   position: relative;
+  width: 800px;
+  height: 533px;
   padding-right: 40px;
   padding-left: 20px;
   padding-top: 20px;
@@ -66,6 +68,7 @@
 }
 
 .inputContainer {
+  width: 800px;
   padding-right: 35px;
   padding-left: 20px;
 }
