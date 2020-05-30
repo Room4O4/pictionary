@@ -12,6 +12,7 @@
     "react-countdown-clock": "^2.7.0",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
+    "react-simple-keyboard": "^2.3.33",
     "socket.io-client": "^2.3.0"
   },
   "scripts": {
