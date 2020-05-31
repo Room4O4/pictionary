@@ -1,28 +1,22 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FixedSizeList as List } from "react-window";
+import React, { useState, useEffect, useRef } from 'react';
+import { FixedSizeList as List } from 'react-window';
+import { withHeight } from '../utils/WindowHeight';
 
-const LogWindow = ({ messages }) => {
+const LogWindow = ({ messages, height }) => {
   const listRef = useRef();
 
-  const renderRow = ({ data, index }) => {
+  const renderRow = ({ data, index, style }) => {
     console.log(data);
-    return <div>{data[index]}</div>;
+    return <div style={{ ...style, height: 25 }}>{data[index]}</div>;
   };
 
   useEffect(() => {
-    if (listRef.current)
-      listRef.current.scrollToTop = listRef.current.scrollHeight;
+    if (listRef.current) listRef.current.scrollToTop = listRef.current.scrollHeight;
   });
 
   if (messages && messages.length > 0) {
     return (
-      <List
-        height={400}
-        itemCount={messages.length}
-        itemSize={10}
-        itemData={messages}
-        ref={listRef}
-      >
+      <List height={height - 83} itemCount={messages.length} itemSize={25} itemData={messages} ref={listRef}>
         {renderRow}
       </List>
     );
@@ -31,4 +25,4 @@ const LogWindow = ({ messages }) => {
   }
 };
 
-export default LogWindow;
+export default withHeight(LogWindow);
