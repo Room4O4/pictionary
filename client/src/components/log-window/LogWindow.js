@@ -5,7 +5,7 @@ import Divider from "@material-ui/core/Divider";
 import ListItemText from "@material-ui/core/ListItemText";
 import "./LogWindow.css";
 
-const LogWindow = ({ messages }) => {
+const LogWindow = ({ messages, height }) => {
   const listRef = useRef();
   const MSG_CLASS_SYSTEM = "msgSystem!!!";
   const MSG_CLASS_USER_GUESS = "msgUserGuess!!!";
@@ -39,4 +39,4 @@ const LogWindow = ({ messages }) => {
   }
 };
 
-export default LogWindow;
+export default withHeight(LogWindow);
