@@ -39,4 +39,4 @@ const LogWindow = ({ messages, height }) => {
   }
 };
 
-export default withHeight(LogWindow);
+export default LogWindow;
