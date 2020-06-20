@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
-import socket from 'socket.io-client';
-import Canvas from './components/Canvas';
-import { TextField } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from 'react-avatar';
-import Typography from '@material-ui/core/Typography';
-import ReactCountdownClock from 'react-countdown-clock';
-import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
+import React, { useState, useEffect, useRef } from "react";
+import "./App.css";
+import socket from "socket.io-client";
+import Canvas from "./components/Canvas";
+import { TextField } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import List from "@material-ui/core/List";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemText from "@material-ui/core/ListItemText";
+import ListItemAvatar from "@material-ui/core/ListItemAvatar";
+import Avatar from "react-avatar";
+import Typography from "@material-ui/core/Typography";
+import ReactCountdownClock from "react-countdown-clock";
+import AddNicknameDialog from "./components/dialogs/AddNicknameDialog";
+import LogWindow from "./components/log-window/LogWindow";
 
 function App() {
   const [socketIO, setSocketIO] = useState(null);
@@ -22,7 +23,7 @@ function App() {
   const [showGuessBox, setShowGuessBox] = useState(false);
   const [enableGuessBox, setEnableGuessBox] = useState(false);
 
-  const [guess, setGuess] = useState('');
+  const [guess, setGuess] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
   const [userScores, setUserScores] = useState(null);
   const [previousWord, setPreviousWord] = useState(null);
@@ -34,7 +35,10 @@ function App() {
   const GAME_STATE_NEW_ROUND = 2;
   const GAME_STATE_WAIT_FOR_NEXT_ROUND = 3;
   const GAME_STATE_ANNOUNCE_WINNER = 4;
+
   const [gameState, setGameState] = useState(GAME_STATE_IDLE);
+
+  const [messageLog, setMessageLog] = useState([]);
 
   useEffect(() => {
     if (guessBoxRef && guessBoxRef.current) guessBoxRef.current.focus();
@@ -42,65 +46,75 @@ function App() {
 
   useEffect(() => {
     if (playerNickname) {
-      const io = socket('http://localhost:3001');
-      io.on('connect', () => {
+      const io = socket("http://localhost:3001");
+      io.on("connect", () => {
         const user = {
           id: `${playerNickname}_${+new Date()}`,
           name: `${playerNickname}`,
           score: 0,
         };
-        io.emit('C_S_LOGIN', user);
-        io.on('S_C_LOGIN', () => {
-          console.log('Login success');
+        io.emit("C_S_LOGIN", user);
+        io.on("S_C_LOGIN", () => {
+          console.log("Login success");
           setCurrentUser(user);
+          setMessageLog((messageLog) => [...messageLog, "msgSystem!!!Logged in"]);
         });
 
-        io.on('GE_NEW_GAME', (roundDuration) => {
-          console.log('New Game starting...');
+        io.on("GE_NEW_GAME", (roundDuration) => {
+          console.log("New Game starting...");
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
           setGameState(GAME_STATE_NEW_GAME);
+          setMessageLog((messageLog) => [...messageLog, "msgSystem!!!New Game starting..."]);
         });
 
-        io.on('GE_NEW_ROUND', ({ round, total }) => {
+        io.on("GE_NEW_ROUND", ({ round, total }) => {
           setDrawWord(null);
-          setGuess('');
+          setGuess("");
           setShowGuessBox(true);
           setEnableGuessBox(true);
           setPreviousWord(null);
           setGameState(GAME_STATE_NEW_ROUND);
           console.log(`New Round starting, Round: ${round}, Total: ${total}`);
+          setMessageLog((messageLog) => [
+            ...messageLog,
+            `msgSystem!!!New Round starting, Round: ${round}, Total: ${total}`,
+          ]);
         });
 
-        io.on('GE_WAIT_FOR_NEXT_ROUND', (previousWord) => {
+        io.on("GE_WAIT_FOR_NEXT_ROUND", (previousWord) => {
           setShowGuessBox(false);
           setDrawWord(null);
           setPreviousWord(previousWord);
           setGameState(GAME_STATE_WAIT_FOR_NEXT_ROUND);
+          setMessageLog((messageLog) => [...messageLog, `msgSystem!!!Round finished, Wait for next round...`]);
         });
 
-        io.on('GE_ANNOUNCE_WINNER', () => {
+        io.on("GE_ANNOUNCE_WINNER", () => {
           setShowGuessBox(false);
           setDrawWord(null);
           console.log(`Announce Winner`);
           setShowGuessBox(false);
           setDrawWord(null);
           setGameState(GAME_STATE_ANNOUNCE_WINNER);
+          setMessageLog((messageLog) => [...messageLog, `msgSystemWinner!!!Game Over, And the Winner is...`]);
         });
 
-        io.on('GE_NEW_WORD', (word) => {
+        io.on("GE_NEW_WORD", (word) => {
           setDrawWord(word);
           setShowGuessBox(false);
+          setMessageLog((messageLog) => [...messageLog, `msgSystem!!!It's your turn, Draw!`]);
         });
 
-        io.on('GE_UPDATE_SCORE', (userScores) => {
+        io.on("GE_UPDATE_SCORE", (userScores) => {
           console.table(userScores);
           setUserScores(userScores);
+          setMessageLog((messageLog) => [...messageLog, `msgSystem!!!Scores updated!`]);
         });
       });
       setSocketIO(io);
     } else {
-      console.log('playerNickname is null');
+      console.log("playerNickname is null");
     }
   }, [playerNickname]);
 
@@ -109,7 +123,7 @@ function App() {
       console.log(currentUser);
       const latestUserScore = userScores.find((user) => user.id === currentUser.id).score;
       if (latestUserScore > currentUser.score) {
-        console.log('Disable guess box');
+        console.log("Disable guess box");
         //disable guess box if guess is right
         setEnableGuessBox(false);
         currentUser.score = latestUserScore;
@@ -120,12 +134,14 @@ function App() {
   const guessBoxPressed = (e) => {
     if (e.keyCode === 13) {
       //Enter pressed. send it to server
-      setGuess('');
-      console.log('New guess -', currentUser.id, e.target.value);
-      socketIO.emit('GE_NEW_GUESS', {
+      const currentGuess = e.target.value;
+      setGuess("");
+      console.log("New guess -", currentUser.id, currentGuess);
+      socketIO.emit("GE_NEW_GUESS", {
         userId: currentUser.id,
-        guess: e.target.value,
+        guess: currentGuess,
       });
+      setMessageLog((messageLog) => [...messageLog, `msgUserGuess!!!${currentUser.id}: ${currentGuess}`]);
     }
   };
 
@@ -154,7 +170,7 @@ function App() {
   };
 
   useEffect(() => {
-    document.body.addEventListener('touchmove', function (e) {
+    document.body.addEventListener("touchmove", function (e) {
       e.preventDefault();
     });
   }, []);
@@ -171,12 +187,12 @@ function App() {
             {buildUserList()}
           </List>
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={6}>
           <Grid item xs={12} className="canvasContainer">
             <Canvas io={socketIO} />
             {gameState === GAME_STATE_NEW_ROUND ? (
               <div className="timer">
-                <ReactCountdownClock className="timer" seconds={roundDuration} color="#000" alpha={0.9} size={60} />{' '}
+                <ReactCountdownClock className="timer" seconds={roundDuration} color="#000" alpha={0.9} size={60} />{" "}
               </div>
             ) : null}
           </Grid>
@@ -202,6 +218,9 @@ function App() {
               <Typography variant="body1">Previous word was {previousWord}</Typography>
             </Grid>
           ) : null}
+        </Grid>
+        <Grid item xs={3}>
+          <LogWindow className="logWindow" messages={messageLog}></LogWindow>
         </Grid>
       </Grid>
       {!playerNickname && <AddNicknameDialog onNicknameAdded={onNicknameAdded} />}

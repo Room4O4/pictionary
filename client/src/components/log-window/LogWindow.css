@@ -1,0 +1,11 @@
+.LogWindow {
+  overflow: auto;
+  height: 533px;
+}
+.msgSystem {
+  color: black;
+}
+
+.msgUserGuess {
+  color: blue;
+}
