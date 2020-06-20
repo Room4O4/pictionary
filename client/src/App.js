@@ -35,6 +35,7 @@ function App() {
   const GAME_STATE_NEW_ROUND = 2;
   const GAME_STATE_WAIT_FOR_NEXT_ROUND = 3;
   const GAME_STATE_ANNOUNCE_WINNER = 4;
+
   const [gameState, setGameState] = useState(GAME_STATE_IDLE);
 
   const [messageLog, setMessageLog] = useState([]);
@@ -56,7 +57,7 @@ function App() {
         io.on("S_C_LOGIN", () => {
           console.log("Login success");
           setCurrentUser(user);
-          setMessageLog((messageLog) => [...messageLog, "Logged in"]);
+          setMessageLog((messageLog) => [...messageLog, "msgSystem!!!Logged in"]);
         });
 
         io.on("GE_NEW_GAME", (roundDuration) => {
@@ -64,10 +65,7 @@ function App() {
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
           setGameState(GAME_STATE_NEW_GAME);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            "New Game starting...",
-          ]);
+          setMessageLog((messageLog) => [...messageLog, "msgSystem!!!New Game starting..."]);
         });
 
         io.on("GE_NEW_ROUND", ({ round, total }) => {
@@ -80,7 +78,7 @@ function App() {
           console.log(`New Round starting, Round: ${round}, Total: ${total}`);
           setMessageLog((messageLog) => [
             ...messageLog,
-            `New Round starting, Round: ${round}, Total: ${total}`,
+            `msgSystem!!!New Round starting, Round: ${round}, Total: ${total}`,
           ]);
         });
 
@@ -89,10 +87,7 @@ function App() {
           setDrawWord(null);
           setPreviousWord(previousWord);
           setGameState(GAME_STATE_WAIT_FOR_NEXT_ROUND);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            `Round finished, Wait for next round...`,
-          ]);
+          setMessageLog((messageLog) => [...messageLog, `msgSystem!!!Round finished, Wait for next round...`]);
         });
 
         io.on("GE_ANNOUNCE_WINNER", () => {
@@ -102,25 +97,19 @@ function App() {
           setShowGuessBox(false);
           setDrawWord(null);
           setGameState(GAME_STATE_ANNOUNCE_WINNER);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            `Game Over, And the Winner is...`,
-          ]);
+          setMessageLog((messageLog) => [...messageLog, `msgSystemWinner!!!Game Over, And the Winner is...`]);
         });
 
         io.on("GE_NEW_WORD", (word) => {
           setDrawWord(word);
           setShowGuessBox(false);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            `It's your turn, Draw!`,
-          ]);
+          setMessageLog((messageLog) => [...messageLog, `msgSystem!!!It's your turn, Draw!`]);
         });
 
         io.on("GE_UPDATE_SCORE", (userScores) => {
           console.table(userScores);
           setUserScores(userScores);
-          setMessageLog((messageLog) => [...messageLog, `Scores updated!`]);
+          setMessageLog((messageLog) => [...messageLog, `msgSystem!!!Scores updated!`]);
         });
       });
       setSocketIO(io);
@@ -132,9 +121,7 @@ function App() {
   useEffect(() => {
     if (userScores && currentUser) {
       console.log(currentUser);
-      const latestUserScore = userScores.find(
-        (user) => user.id === currentUser.id
-      ).score;
+      const latestUserScore = userScores.find((user) => user.id === currentUser.id).score;
       if (latestUserScore > currentUser.score) {
         console.log("Disable guess box");
         //disable guess box if guess is right
@@ -147,12 +134,14 @@ function App() {
   const guessBoxPressed = (e) => {
     if (e.keyCode === 13) {
       //Enter pressed. send it to server
+      const currentGuess = e.target.value;
       setGuess("");
-      console.log("New guess -", currentUser.id, e.target.value);
+      console.log("New guess -", currentUser.id, currentGuess);
       socketIO.emit("GE_NEW_GUESS", {
         userId: currentUser.id,
-        guess: e.target.value,
+        guess: currentGuess,
       });
+      setMessageLog((messageLog) => [...messageLog, `msgUserGuess!!!${currentUser.id}: ${currentGuess}`]);
     }
   };
 
@@ -162,12 +151,7 @@ function App() {
       return (
         <ListItem id={userScore.id} className="userScoreListItem">
           <ListItemAvatar>
-            <Avatar
-              name={userScore.name}
-              round={true}
-              size="30"
-              textSizeRatio={1.75}
-            />
+            <Avatar name={userScore.name} round={true} size="30" textSizeRatio={1.75} />
           </ListItemAvatar>
           <ListItemText>
             <Typography variant="body1" className="userScoreListItemId">
@@ -208,13 +192,7 @@ function App() {
             <Canvas io={socketIO} />
             {gameState === GAME_STATE_NEW_ROUND ? (
               <div className="timer">
-                <ReactCountdownClock
-                  className="timer"
-                  seconds={roundDuration}
-                  color="#000"
-                  alpha={0.9}
-                  size={60}
-                />{" "}
+                <ReactCountdownClock className="timer" seconds={roundDuration} color="#000" alpha={0.9} size={60} />{" "}
               </div>
             ) : null}
           </Grid>
@@ -237,19 +215,15 @@ function App() {
           </Grid>
           {previousWord ? (
             <Grid item xs={12}>
-              <Typography variant="body1">
-                Previous word was {previousWord}
-              </Typography>
+              <Typography variant="body1">Previous word was {previousWord}</Typography>
             </Grid>
           ) : null}
         </Grid>
         <Grid item xs={3}>
-          <LogWindow messages={messageLog}></LogWindow>
+          <LogWindow className="logWindow" messages={messageLog}></LogWindow>
         </Grid>
       </Grid>
-      {!playerNickname && (
-        <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-      )}
+      {!playerNickname && <AddNicknameDialog onNicknameAdded={onNicknameAdded} />}
     </div>
   );
 }
