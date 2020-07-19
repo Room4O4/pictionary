@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import socket from "socket.io-client";
 import Canvas from "./components/Canvas";
-import { TextField } from "@material-ui/core";
+import { TextField, Hidden } from "@material-ui/core";
 import Grid from "@material-ui/core/Grid";
 import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
@@ -182,12 +182,15 @@ function App() {
     <div className="App">
       <h4>Pictionary</h4>
       <Grid container className="layoutContainer">
-        <Grid item xs={3}>
-          <List component="nav" className="userScoreList">
-            {buildUserList()}
-          </List>
-        </Grid>
-        <Grid item xs={6}>
+        <Hidden smDown>
+          <Grid item md={3}>
+            <List component="nav" className="userScoreList">
+              {buildUserList()}
+            </List>
+          </Grid>
+        </Hidden>
+
+        <Grid item md={6} xs={12}>
           <Grid item xs={12} className="canvasContainer">
             <Canvas io={socketIO} />
             {gameState === GAME_STATE_NEW_ROUND ? (
@@ -219,9 +222,12 @@ function App() {
             </Grid>
           ) : null}
         </Grid>
-        <Grid item xs={3}>
-          <LogWindow className="logWindow" messages={messageLog}></LogWindow>
-        </Grid>
+
+        <Hidden smDown>
+          <Grid item md={3}>
+            <LogWindow className="logWindow" messages={messageLog}></LogWindow>
+          </Grid>
+        </Hidden>
       </Grid>
       {!playerNickname && <AddNicknameDialog onNicknameAdded={onNicknameAdded} />}
     </div>
