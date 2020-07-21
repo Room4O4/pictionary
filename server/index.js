@@ -14,15 +14,14 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  
   debug('A user connected');
-  
-  let interval = setInterval(() => updateServerTime(socket), 1000);
-  
+
+  const interval = setInterval(() => updateServerTime(socket), 1000);
+
   socket.on('disconnect', () => {
     clearInterval(interval);
   });
-  
+
   socket.on('C_S_LOGIN', async (user, room) => {
     try {
       // log in the user
@@ -35,15 +34,11 @@ io.on('connection', (socket) => {
       await game.addNewUser(user.id, socket.id, room || DEFAULT_ROOM);
 
       socket.emit('S_C_LOGIN', loginResult);
-
     } catch (error) {
-
       debug('Error Logging in - ', error);
       socket.disconnect();
-
     }
   });
-
 });
 
 const updateServerTime = (socket) => {

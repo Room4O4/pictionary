@@ -1,7 +1,7 @@
-let _users = [];
+const _users = [];
 
 const _validateLogin = async (user) => {
-  //Make db call
+  // Make db call
   return Promise.resolve(true);
 };
 
