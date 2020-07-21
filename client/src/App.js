@@ -9,6 +9,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from 'react-avatar';
+import Keyboard from 'react-simple-keyboard';
+import 'react-simple-keyboard/build/css/index.css';
 import Typography from '@material-ui/core/Typography';
 import ReactCountdownClock from 'react-countdown-clock';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
@@ -28,6 +30,7 @@ function App () {
   const [userScores, setUserScores] = useState(null);
   const [previousWord, setPreviousWord] = useState(null);
   const guessBoxRef = useRef(null);
+  const keyboardRef = useRef();
   const [roundDuration, setRoundDuration] = useState(0);
 
   const GAME_STATE_IDLE = 0;
@@ -155,17 +158,26 @@ function App () {
     if (e.keyCode === 13) {
       // Enter pressed. send it to server
       const currentGuess = e.target.value;
-      setGuess('');
-      console.log('New guess -', currentUser.id, currentGuess);
-      socketIO.emit('GE_NEW_GUESS', {
-        userId: currentUser.id,
-        guess: currentGuess
-      });
+      sendGuessToServer();
+      resetGuess();
       setMessageLog((messageLog) => [
         ...messageLog,
         `msgUserGuess!!!${currentUser.id}: ${currentGuess}`
       ]);
     }
+  };
+
+  const sendGuessToServer = () => {
+    console.log('New guess -', currentUser.id, guess);
+    socketIO.emit('GE_NEW_GUESS', {
+      userId: currentUser.id,
+      guess: guess
+    });
+  };
+
+  const resetGuess = () => {
+    setGuess('');
+    keyboardRef.current.setInput('');
   };
 
   const buildUserList = () => {
@@ -210,6 +222,19 @@ function App () {
     setPlayerNickname(nickname);
   };
 
+  const onKeyboardInputChange = (input) => {
+    console.log('Input changed', input);
+    setGuess(input);
+  };
+
+  const onKeyPress = (button) => {
+    console.log('Button pressed', button);
+    if (button === '{enter}') {
+      sendGuessToServer();
+      resetGuess();
+    }
+  };
+
   return (
     <div className="App">
       <h4>Pictionary</h4>
@@ -248,11 +273,30 @@ function App () {
                 value={guess}
                 variant="outlined"
                 onKeyDown={(e) => guessBoxPressed(e)}
-                onChange={(e) => setGuess(e.target.value)}
+                onChange={(e) => {
+                  setGuess(e.target.value);
+                  keyboardRef.current.setInput(e.target.value);
+                }}
               />
             ) : (
               <Typography variant="h3">{drawWord}</Typography>
             )}
+          </Grid>
+          <Grid item xs={12} className="keyboardContainer">
+            {showGuessBox ? (
+              <Keyboard
+                keyboardRef={(r) => (keyboardRef.current = r)}
+                onChange={onKeyboardInputChange}
+                onKeyPress={onKeyPress}
+                layout={{
+                  default: [
+                    'q w e r t y u i o p',
+                    'a s d f g h k l {enter}',
+                    'z x c v b n m'
+                  ]
+                }}
+              />
+            ) : null}
           </Grid>
           {previousWord ? (
             <Grid item xs={12}>
