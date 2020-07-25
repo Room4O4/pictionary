@@ -1,34 +1,59 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './canvas.css';
+import React, { useState, useEffect, useRef } from "react";
+import "./canvas.css";
 
 const Canvas = ({ io }) => {
   let drawing = false;
   let current = { x: 0, y: 0 };
   let canvasRef = useRef(null);
+  let coordinates = useRef([]);
 
   useEffect(() => {
     if (io) {
-      io.on('S_C_DRAW', onDrawingEvent);
-      io.on('GE_NEW_ROUND', (roundNumber, totalRounds) => {
-        const context = canvasRef.current.getContext('2d');
+      io.on("S_C_DRAW", onDrawingEvent);
+      io.on("GE_NEW_ROUND", (roundNumber, totalRounds) => {
+        const context = canvasRef.current.getContext("2d");
         context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        coordinates = [];
       });
+
+      if (coordinates.current) {
+        restoreCanvas(coordinates.current);
+      }
     }
   });
 
   useEffect(() => {
-    window.addEventListener('resize', onResize, false);
+    window.addEventListener("resize", () => onResize(), false);
     onResize();
   }, []);
+
+  function restoreCanvas(coordinates) {
+    var rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
+    const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
+    console.log("Restore points");
+    for (let index = 1; index < coordinates.length; index++) {
+      let prev = coordinates[index - 1];
+      let next = coordinates[index];
+      prev.x = (prev.x - rect.left) * scaleX;
+      prev.y = (prev.y - rect.top) * scaleY;
+      next.x = (next.x - rect.left) * scaleX;
+      next.y = (next.y - rect.top) * scaleY;
+      drawLine(prev.x, prev.y, next.x, next.y, "#FF0000", true);
+    }
+  }
 
   // make the canvas fill its parent
   function onResize() {
     canvasRef.current.width = window.innerWidth;
     canvasRef.current.height = window.innerHeight;
+    if (io) {
+      restoreCanvas(coordinates.current);
+    }
   }
 
   function drawLine(x0, y0, x1, y1, color, emit) {
-    const context = canvasRef.current.getContext('2d');
+    const context = canvasRef.current.getContext("2d");
     context.beginPath();
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
@@ -43,7 +68,7 @@ const Canvas = ({ io }) => {
     var w = canvasRef.current.width;
     var h = canvasRef.current.height;
 
-    io.emit('C_S_DRAW', {
+    io.emit("C_S_DRAW", {
       x0: x0 / w,
       y0: y0 / h,
       x1: x1 / w,
@@ -64,6 +89,7 @@ const Canvas = ({ io }) => {
     drawing = true;
     current.x = x;
     current.y = y;
+    coordinates.current.push(current);
   }
 
   function onMouseUp(e) {
@@ -84,6 +110,7 @@ const Canvas = ({ io }) => {
     var x = (inputX - rect.left) * scaleX; //x position within the element.
     var y = (inputY - rect.top) * scaleY; //y position within the element.
     drawLine(current.x, current.y, x, y, current.color, true);
+    coordinates.current.push({ x, y });
   }
 
   function onMouseMove(e) {
@@ -101,6 +128,7 @@ const Canvas = ({ io }) => {
     drawLine(current.x, current.y, x, y, current.color, true);
     current.x = x;
     current.y = y;
+    coordinates.current.push(current);
   }
 
   // limit the number of events per second
