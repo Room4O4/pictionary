@@ -6,8 +6,6 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 const GenericDialog = (props) => {
-  const { classes } = props;
-
   const handleClose = () => {
     props.handleClose();
   };

@@ -12,8 +12,8 @@
     "react-countdown-clock": "^2.7.0",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "react-window": "^1.8.5",
     "react-simple-keyboard": "^2.3.33",
+    "react-window": "^1.8.5",
     "socket.io-client": "^2.3.0"
   },
   "scripts": {
@@ -23,13 +23,15 @@
     "lint": "eslint $PWD/'src/*.js' $PWD/'src/**/*.js'",
     "lint:fix": "prettier-eslint $PWD/'src/*.js' $PWD/'src/**/*.js' --write"
   },
-  "husky":{
+  "husky": {
     "hooks": {
-      "pre-commit" : "lint-staged"
+      "pre-commit": "lint-staged"
     }
   },
-  "lint-staged":{
-    "*.js": ["npm run lint:fix"]
+  "lint-staged": {
+    "*.js": [
+      "npm run lint:fix"
+    ]
   },
   "eslintConfig": {
     "extends": "react-app"

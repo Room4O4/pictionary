@@ -4,23 +4,23 @@ import socket from 'socket.io-client';
 import Canvas from './components/Canvas';
 import { TextField, Hidden } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
-import Avatar from 'react-avatar';
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
 import Typography from '@material-ui/core/Typography';
 import ReactCountdownClock from 'react-countdown-clock';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
 import LogWindow from './components/log-window/LogWindow';
+import UserScoreList from './components/player-list/UserScoreList';
+import PlayersIcon from './components/icons/PlayersIcon';
+import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);
   const [drawWord, setDrawWord] = useState(null);
 
   const [playerNickname, setPlayerNickname] = useState(null);
+
+  const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
 
   const [showGuessBox, setShowGuessBox] = useState(false);
   const [enableGuessBox, setEnableGuessBox] = useState(false);
@@ -152,7 +152,7 @@ function App () {
         currentUser.score = latestUserScore;
       }
     }
-  }, [userScores]);
+  }, [userScores, currentUser]);
 
   const guessBoxPressed = (e) => {
     if (e.keyCode === 13) {
@@ -180,44 +180,12 @@ function App () {
     keyboardRef.current.setInput('');
   };
 
-  const buildUserList = () => {
-    if (!userScores) return null;
-    const renderUsers = userScores.map((userScore) => {
-      return (
-        <ListItem
-          id={userScore.id}
-          key={userScore.id}
-          className="userScoreListItem"
-        >
-          <ListItemAvatar>
-            <Avatar
-              name={userScore.name}
-              round={true}
-              size="30"
-              textSizeRatio={1.75}
-            />
-          </ListItemAvatar>
-          <ListItemText>
-            <Typography variant="body1" className="userScoreListItemId">
-              {userScore.name}
-            </Typography>
-          </ListItemText>
-          <ListItemText>
-            <Typography variant="body1" className="userScoreListItemPoints">
-              {userScore.score}
-            </Typography>
-          </ListItemText>
-        </ListItem>
-      );
-    });
-    return renderUsers;
-  };
-
   useEffect(() => {
     document.body.addEventListener('touchmove', function (e) {
       e.preventDefault();
     });
   }, []);
+
   const onNicknameAdded = (nickname) => {
     setPlayerNickname(nickname);
   };
@@ -241,12 +209,9 @@ function App () {
       <Grid container className="layoutContainer">
         <Hidden smDown>
           <Grid item md={3}>
-            <List component="nav" className="userScoreList">
-              {buildUserList()}
-            </List>
+            <UserScoreList userScores={userScores} />
           </Grid>
         </Hidden>
-
         <Grid item md={6} xs={12}>
           <Grid item xs={12} className="canvasContainer">
             <Canvas io={socketIO} />
@@ -261,6 +226,14 @@ function App () {
                 />{' '}
               </div>
             ) : null}
+            <Hidden smUp>
+              <PlayersIcon
+                onClick={() => {
+                  setShouldShowPlayersList(true);
+                }}
+                className="playersIcon"
+              />
+            </Hidden>
           </Grid>
           <Grid item xs={12} className="inputContainer">
             {showGuessBox ? (
@@ -315,6 +288,15 @@ function App () {
       </Grid>
       {!playerNickname && (
         <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
+      )}
+
+      {shouldShowPlayersList && (
+        <UserScoreListDialog
+          userScores={userScores}
+          handleDone={() => {
+            setShouldShowPlayersList(false);
+          }}
+        />
       )}
     </div>
   );
