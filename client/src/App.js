@@ -182,7 +182,7 @@ function App () {
 
   useEffect(() => {
     document.body.addEventListener('touchmove', function (e) {
-      e.preventDefault();
+      // e.preventDefault();
     });
   }, []);
 

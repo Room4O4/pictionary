@@ -6,6 +6,52 @@ const Canvas = ({ io }) => {
   const current = { x: 0, y: 0 };
   const canvasRef = useRef(null);
 
+  /*
+   * The below four methods helps resize the canvas and preserve scale.
+   * However at this point, we don't care about resizing as people rarely do that
+   * For more info on how these work, refer - https://www.pluralsight.com/guides/render-window-resize-react
+
+  let coordinates = useRef([]);
+
+  const [scale, setScale] = React.useState({ x: 1, y: 1 });
+  const calculateScaleX = () => canvasRef.current.clientWidth / 500;
+  const calculateScaleY = () => canvasRef.current.clientHeight / 500;
+
+   const resized = () => {
+    canvasRef.current.width = canvasRef.current.clientWidth;
+    canvasRef.current.height = canvasRef.current.clientHeight;
+    setScale({ x: calculateScaleX(), y: calculateScaleY() });
+  };
+
+  useEffect(() => {
+    //window.addEventListener("resize", () => onResize(), false);
+    //onResize();
+
+    const currentCanvas = canvasRef.current;
+    window.addEventListener("resize", resized);
+    return () => window.removeEventListener("resize", resized);
+  });
+
+  useEffect(() => {
+    restoreCanvas(coordinates.current, scale);
+  }, [scale]);
+
+    function restoreCanvas(coordinates) {
+    var rect = canvasRef.current.getBoundingClientRect();
+    const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
+    const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
+    for (let index = 1; index < coordinates.length; index++) {
+      let prev = coordinates[index - 1];
+      let next = coordinates[index];
+      prev.x = (prev.x - rect.left) * scaleX;
+      prev.y = (prev.y - rect.top) * scaleY;
+      next.x = (next.x - rect.left) * scaleX;
+      next.y = (next.y - rect.top) * scaleY;
+      drawLine(prev.x, prev.y, next.x, next.y, undefined, true);
+    }
+  }
+  */
+
   useEffect(() => {
     if (io) {
       io.on('S_C_DRAW', onDrawingEvent);
@@ -21,15 +67,17 @@ const Canvas = ({ io }) => {
     }
   });
 
+  // We resize the canvas to set scale once component is loaded
   useEffect(() => {
-    window.addEventListener('resize', onResize, false);
     onResize();
   }, []);
 
   // make the canvas fill its parent
-  function onResize () {
-    canvasRef.current.width = window.innerWidth;
-    canvasRef.current.height = window.innerHeight;
+  // Ref - https://stackoverflow.com/a/10215724
+  function onResize (e) {
+    canvasRef.current.width = canvasRef.current.offsetWidth;
+    canvasRef.current.height = canvasRef.current.offsetHeight;
+    // restoreCanvas(coordinates.current);
   }
 
   function drawLine (x0, y0, x1, y1, color, emit) {
@@ -38,7 +86,7 @@ const Canvas = ({ io }) => {
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
     context.strokeStyle = color;
-    context.lineWidth = 4;
+    context.lineWidth = 2;
     context.stroke();
     context.closePath();
 
