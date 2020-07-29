@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const withHeight = WrappedComponent => {
+export const withHeight = (WrappedComponent) => {
   class WindowHeight extends React.Component {
     state = {
       height: window.innerHeight

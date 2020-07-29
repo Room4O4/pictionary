@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from "react";
-import "./canvas.css";
+import React, { useEffect, useRef } from 'react';
+import './canvas.css';
 
 const Canvas = ({ io }) => {
   let drawing = false;
-  let current = { x: 0, y: 0 };
-  let canvasRef = useRef(null);
+  const current = { x: 0, y: 0 };
+  const canvasRef = useRef(null);
 
   /*
    * The below four methods helps resize the canvas and preserve scale.
@@ -54,10 +54,15 @@ const Canvas = ({ io }) => {
 
   useEffect(() => {
     if (io) {
-      io.on("S_C_DRAW", onDrawingEvent);
-      io.on("GE_NEW_ROUND", (roundNumber, totalRounds) => {
-        const context = canvasRef.current.getContext("2d");
-        context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      io.on('S_C_DRAW', onDrawingEvent);
+      io.on('GE_NEW_ROUND', (roundNumber, totalRounds) => {
+        const context = canvasRef.current.getContext('2d');
+        context.clearRect(
+          0,
+          0,
+          canvasRef.current.width,
+          canvasRef.current.height
+        );
       });
     }
   });
@@ -69,14 +74,14 @@ const Canvas = ({ io }) => {
 
   // make the canvas fill its parent
   // Ref - https://stackoverflow.com/a/10215724
-  function onResize(e) {
+  function onResize (e) {
     canvasRef.current.width = canvasRef.current.offsetWidth;
     canvasRef.current.height = canvasRef.current.offsetHeight;
-    //restoreCanvas(coordinates.current);
+    // restoreCanvas(coordinates.current);
   }
 
-  function drawLine(x0, y0, x1, y1, color, emit) {
-    const context = canvasRef.current.getContext("2d");
+  function drawLine (x0, y0, x1, y1, color, emit) {
+    const context = canvasRef.current.getContext('2d');
     context.beginPath();
     context.moveTo(x0, y0);
     context.lineTo(x1, y1);
@@ -91,16 +96,15 @@ const Canvas = ({ io }) => {
     var w = canvasRef.current.width;
     var h = canvasRef.current.height;
 
-    io.emit("C_S_DRAW", {
+    io.emit('C_S_DRAW', {
       x0: x0 / w,
       y0: y0 / h,
       x1: x1 / w,
       y1: y1 / h,
-      color: color,
+      color: color
     });
   }
-
-  function onMouseDown(e) {
+  function onMouseDown (e) {
     // e = Mouse click event.
     var rect = e.target.getBoundingClientRect();
     const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
@@ -108,14 +112,14 @@ const Canvas = ({ io }) => {
     const inputX = e.clientX || e.touches[0].clientX;
     const inputY = e.clientY || e.touches[0].clientY;
 
-    var x = (inputX - rect.left) * scaleX; //x position within the element.
-    var y = (inputY - rect.top) * scaleY; //y position within the element.
+    var x = (inputX - rect.left) * scaleX; // x position within the element.
+    var y = (inputY - rect.top) * scaleY; // y position within the element.
     drawing = true;
     current.x = x;
     current.y = y;
   }
 
-  function onMouseUp(e) {
+  function onMouseUp (e) {
     if (!drawing) {
       return;
     }
@@ -130,12 +134,12 @@ const Canvas = ({ io }) => {
     const inputX = e.clientX || e.touches[0].clientX;
     const inputY = e.clientY || e.touches[0].clientY;
 
-    var x = (inputX - rect.left) * scaleX; //x position within the element.
-    var y = (inputY - rect.top) * scaleY; //y position within the element.
+    var x = (inputX - rect.left) * scaleX; // x position within the element.
+    var y = (inputY - rect.top) * scaleY; // y position within the element.
     drawLine(current.x, current.y, x, y, current.color, true);
   }
 
-  function onMouseMove(e) {
+  function onMouseMove (e) {
     if (!drawing) {
       return;
     }
@@ -144,8 +148,8 @@ const Canvas = ({ io }) => {
     const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
     const inputX = e.clientX || e.touches[0].clientX;
     const inputY = e.clientY || e.touches[0].clientY;
-    var x = (inputX - rect.left) * scaleX; //x position within the element.
-    var y = (inputY - rect.top) * scaleY; //y position within the element.
+    var x = (inputX - rect.left) * scaleX; // x position within the element.
+    var y = (inputY - rect.top) * scaleY; // y position within the element.
 
     drawLine(current.x, current.y, x, y, current.color, true);
     current.x = x;
@@ -153,7 +157,7 @@ const Canvas = ({ io }) => {
   }
 
   // limit the number of events per second
-  function throttle(callback, delay) {
+  function throttle (callback, delay) {
     var previousCall = new Date().getTime();
     return function () {
       var time = new Date().getTime();
@@ -165,7 +169,7 @@ const Canvas = ({ io }) => {
     };
   }
 
-  function onDrawingEvent(data) {
+  function onDrawingEvent (data) {
     var w = canvasRef.current.width;
     var h = canvasRef.current.height;
     drawLine(data.x0 * w, data.y0 * h, data.x1 * w, data.y1 * h, data.color);

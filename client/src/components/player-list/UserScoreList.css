@@ -1,0 +1,13 @@
+
+.userScoreList {
+  overflow: auto;
+  max-height: 50%;
+  height: 50%;
+}
+.userScoreListItem {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  min-width: 200px;
+}
+
