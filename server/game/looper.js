@@ -1,8 +1,8 @@
-const debug = require("debug")("pictionary.game.looper");
-const picWordGenerator = require("pic-word-gen");
+const debug = require('debug')('pictionary.game.looper');
+const picWordGenerator = require('pic-word-gen');
 
 class Looper {
-  constructor(room, roomEventBridge) {
+  constructor (room, roomEventBridge) {
     this.ROUND_DURATION = 30000;
     this.GAME_STATE_IDLE = 0;
     this.GAME_STATE_ROUND_IN_PROGRESS = 1;
@@ -19,11 +19,11 @@ class Looper {
     this._winnerAnnouncementInProgress = false;
     this._currentUserDrawIndex = 0;
     this._roomEventBridge = roomEventBridge;
-    this._roomEventBridge.broadcastRoomState("GE_IDLE");
-    this._roomEventBridge.on("GE_NEW_GUESS", (userId, guess) => {
+    this._roomEventBridge.broadcastRoomState('GE_IDLE');
+    this._roomEventBridge.on('GE_NEW_GUESS', (userId, guess) => {
       this.evaluateGuess(userId, guess);
     });
-    this._roomEventBridge.on("C_S_LEAVE_ROOM", (userId) => {
+    this._roomEventBridge.on('C_S_LEAVE_ROOM', (userId) => {
       this.removeUser(userId);
     });
   }
@@ -33,11 +33,11 @@ class Looper {
     if (!foundUser) {
       this._users.push({ id: dbUser.id, name: dbUser.name, score: 0 });
     } else {
-      console.log("user already in room");
+      console.log('user already in room');
     }
     this._roomEventBridge.updateUserSocket(dbUser.id, socketId);
     this._roomEventBridge.broadcastScores(this._users);
-    debug("Added new user - ", dbUser);
+    debug('Added new user - ', dbUser);
   }
 
   removeUser (userId) {
@@ -52,17 +52,25 @@ class Looper {
   evaluateGuess (userId, guess) {
     if (!guess) return;
     if (guess.trim().toLowerCase() === this._currentWord.trim().toLowerCase()) {
-      debug("Correct guess by user - ", userId);
+      debug('Correct guess by user - ', userId);
       const foundUser = this._users.find((user) => userId === user.id);
       if (foundUser) {
         foundUser.score += 10;
         this._roomEventBridge.broadcastScores(this._users);
-        //TODO: fetch username and passit across. Why should frontend deal with UserId of other users
-        this._roomEventBridge.broadcastLastGuess(userId.split('_')[0], guess, true);
+        // TODO: fetch username and passit across. Why should frontend deal with UserId of other users
+        this._roomEventBridge.broadcastLastGuess(
+          userId.split('_')[0],
+          guess,
+          true
+        );
       }
     } else {
-        //TODO: fetch username and passit across. Why should frontend deal with UserId of other users
-        this._roomEventBridge.broadcastLastGuess(userId.split('_')[0], guess, false);
+      // TODO: fetch username and passit across. Why should frontend deal with UserId of other users
+      this._roomEventBridge.broadcastLastGuess(
+        userId.split('_')[0],
+        guess,
+        false
+      );
     }
   }
 
@@ -102,7 +110,7 @@ class Looper {
     this._currentUserDrawIndex =
       (this._totalRounds - this._roundsLeft) % this._users.length;
     const currentDrawingUser = this._users[this._currentUserDrawIndex];
-    debug("Current User Drawing - ", currentDrawingUser);
+    debug('Current User Drawing - ', currentDrawingUser);
     // Sometimes the currentDrawing user quits while its his turn to draw. SKIP the round!
     if (!currentDrawingUser) {
       this.evaluateRound();
@@ -138,7 +146,7 @@ class Looper {
 
   stopGame () {
     this._gameState = this.GAME_STATE_ANNOUNCE_WINNER;
-    debug("Game over, Announce winner");
+    debug('Game over, Announce winner');
   }
 
   announceWinner () {

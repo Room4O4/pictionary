@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Typography } from '@material-ui/core';
+import React, { useEffect, useRef } from 'react';
 import './FadeOutText.css';
 
 const FadeOutText = ({ text }) => {
@@ -8,6 +7,7 @@ const FadeOutText = ({ text }) => {
   useEffect(() => {
     console.log('text changed');
     fadeOutElem.current.classList.remove('fadeText');
+    // eslint-disable-next-line no-void
     void fadeOutElem.current.offsetWidth;
     fadeOutElem.current.classList.add('fadeText');
   }, [text]);

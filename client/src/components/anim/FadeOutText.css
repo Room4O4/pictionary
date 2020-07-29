@@ -1,6 +1,6 @@
 .fadeText {
-  -webkit-animation: fado 5s 1;
-  -moz-animation: fado 5s 1;
+  -webkit-animation: fado 5s 1 forwards;
+  -moz-animation: fado 5s 1 forwards;
   animation: fado 5s 1 forwards;
 }
 

@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const e = require('express');
 const debug = require('debug')('pictionary.events.roomEventBridge');
 
 class RoomEventBridge extends EventEmitter {
@@ -57,15 +56,14 @@ class RoomEventBridge extends EventEmitter {
     }
   }
 
-  broadcastLastGuess(userName, guess, found) {
+  broadcastLastGuess (userName, guess, found) {
     debug('broadcast guess from user: ', userName, guess, found);
     if (found) {
-      this._io.emit('GE_UPDATE_GUESS', {userName, found});
+      this._io.emit('GE_UPDATE_GUESS', { userName, found });
     } else {
-      this._io.emit('GE_UPDATE_GUESS', {userName, found, guess});
-    } 
+      this._io.emit('GE_UPDATE_GUESS', { userName, found, guess });
+    }
   }
-
 
   broadcastScores (userScores) {
     this._io.emit('GE_UPDATE_SCORE', userScores);
