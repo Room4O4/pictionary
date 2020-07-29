@@ -57,7 +57,12 @@ class Looper {
       if (foundUser) {
         foundUser.score += 10;
         this._roomEventBridge.broadcastScores(this._users);
+        //TODO: fetch username and passit across. Why should frontend deal with UserId of other users
+        this._roomEventBridge.broadcastLastGuess(userId.split('_')[0], guess, true);
       }
+    } else {
+        //TODO: fetch username and passit across. Why should frontend deal with UserId of other users
+        this._roomEventBridge.broadcastLastGuess(userId.split('_')[0], guess, false);
     }
   }
 

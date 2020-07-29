@@ -1,7 +1,7 @@
-.fade_text {
-  -webkit-animation: fadi 5s 1;
-  -moz-animation: fadi 5s 1;
-  animation: fado 5s 1;
+.fadeText {
+  -webkit-animation: fado 5s 1;
+  -moz-animation: fado 5s 1;
+  animation: fado 5s 1 forwards;
 }
 
 @keyframes fado {
