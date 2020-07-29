@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Fragment } from "react";
 import "./App.css";
 import socket from "socket.io-client";
 import Canvas from "./components/Canvas";
@@ -13,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import ReactCountdownClock from "react-countdown-clock";
 import AddNicknameDialog from "./components/dialogs/AddNicknameDialog";
 import LogWindow from "./components/log-window/LogWindow";
+import FadeOutText from "./components/anim/FadeOutText";
 
 function App() {
   const [socketIO, setSocketIO] = useState(null);
@@ -192,7 +193,10 @@ function App() {
 
         <Grid item md={6} xs={12}>
           <Grid item xs={12} className="canvasContainer">
-            <Canvas io={socketIO} />
+            <Fragment>
+              <Canvas io={socketIO} />
+              <FadeOutText className="liveMessage" text="ABCD"></FadeOutText>
+            </Fragment>
             {gameState === GAME_STATE_NEW_ROUND ? (
               <div className="timer">
                 <ReactCountdownClock className="timer" seconds={roundDuration} color="#000" alpha={0.9} size={60} />{" "}

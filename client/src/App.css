@@ -80,3 +80,7 @@
   z-index: 100;
   padding: inherit;
 }
+
+.liveMessage {
+  margin-top: -40px;
+}

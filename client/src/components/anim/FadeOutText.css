@@ -1,0 +1,32 @@
+.fade_text {
+  -webkit-animation: fadi 5s 1;
+  -moz-animation: fadi 5s 1;
+  animation: fado 5s 1;
+}
+
+@keyframes fado {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fado {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-moz-keyframes fado {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
