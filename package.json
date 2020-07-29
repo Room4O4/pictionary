@@ -9,9 +9,30 @@
     "pic-word-gen": "^1.0.0",
     "socket.io": "^2.3.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "eslint": "^7.5.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.11",
+    "prettier-eslint": "^11.0.0",
+    "prettier-eslint-cli": "^5.0.0"
+  },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server/index.js",
+    "lint": "eslint $PWD/'server/*.js' $PWD/'server/**/*.js'",
+    "lint:fix": "prettier-eslint $PWD/'server/*.js' $PWD/'server/**/*.js' --write"
+  },
+  "husky":{
+    "hooks": {
+      "pre-commit" : "lint-staged"
+    }
+  },
+  "lint-staged":{
+    "*.js": ["npm run lint:fix"]
   },
   "repository": {
     "type": "git",

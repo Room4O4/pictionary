@@ -42,17 +42,6 @@
   max-height: 100vh;
 }
 
-.userScoreList {
-  overflow: auto;
-  max-height: 50%;
-  height: 50%;
-}
-.userScoreListItem {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-}
-
 .guessBox {
   width: 100%;
   margin-right: 30px;
@@ -61,7 +50,7 @@
   position: relative;
   width: 800px;
   height: 533px;
-  padding-right: 40px;
+  padding-right: 20px;
   padding-left: 20px;
   padding-top: 20px;
   padding-bottom: 20px;
@@ -81,6 +70,18 @@
   padding: inherit;
 }
 
-.liveMessage {
-  margin-top: -40px;
+.playersIcon {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  padding: inherit;
+  font-size: 50px;
+  color: cornflowerblue;
+}
+
+.keyboardContainer {
+  display: flex;
+  justify-content: space-around;
+  padding: 20px 35px 20px 20px;
 }
