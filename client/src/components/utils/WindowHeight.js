@@ -5,19 +5,20 @@ export const withHeight = (WrappedComponent) => {
     state = {
       height: window.innerHeight
     };
+
     updatewindowHeight = () => {
       this.setState({ height: window.innerHeight });
     };
 
-    componentDidMount() {
+    componentDidMount () {
       window.addEventListener('resize', this.updatewindowHeight);
     }
 
-    componentWillUnmount() {
+    componentWillUnmount () {
       window.removeEventListener('resize', this.updatewindowHeight);
     }
 
-    render() {
+    render () {
       return <WrappedComponent {...this.props} {...this.state} />;
     }
   }

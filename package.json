@@ -26,13 +26,15 @@
     "lint": "eslint $PWD/'server/*.js' $PWD/'server/**/*.js'",
     "lint:fix": "prettier-eslint $PWD/'server/*.js' $PWD/'server/**/*.js' --write"
   },
-  "husky":{
+  "husky": {
     "hooks": {
-      "pre-commit" : "lint-staged"
+      "pre-commit": "lint-staged"
     }
   },
-  "lint-staged":{
-    "*.js": ["npm run lint:fix"]
+  "lint-staged": {
+    "*.js": [
+      "npm run lint:fix"
+    ]
   },
   "repository": {
     "type": "git",

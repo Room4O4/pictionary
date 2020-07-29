@@ -56,6 +56,15 @@ class RoomEventBridge extends EventEmitter {
     }
   }
 
+  broadcastLastGuess (userName, guess, found) {
+    debug('broadcast guess from user: ', userName, guess, found);
+    if (found) {
+      this._io.emit('GE_UPDATE_GUESS', { userName, found });
+    } else {
+      this._io.emit('GE_UPDATE_GUESS', { userName, found, guess });
+    }
+  }
+
   broadcastScores (userScores) {
     this._io.emit('GE_UPDATE_SCORE', userScores);
   }

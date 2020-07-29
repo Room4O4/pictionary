@@ -1,16 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Divider from '@material-ui/core/Divider';
 import ListItemText from '@material-ui/core/ListItemText';
 import './LogWindow.css';
 
 const LogWindow = ({ messages, height }) => {
   const listRef = useRef();
-  const MSG_CLASS_SYSTEM = 'msgSystem!!!';
-  const MSG_CLASS_USER_GUESS = 'msgUserGuess!!!';
-  const MSG_CLASS_USER_CORRECT_GUESS = 'msgUserCorrectGuess!!!';
-  const MSG_CLASS_SYSTEM_WINNER = 'msgSystemWinner!!!';
 
   const renderRow = (message, index) => {
     const [messageType, actualMessage] = message.split('!!!');

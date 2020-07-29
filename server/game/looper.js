@@ -3,7 +3,7 @@ const picWordGenerator = require('pic-word-gen');
 
 class Looper {
   constructor (room, roomEventBridge) {
-    this.ROUND_DURATION = 3000;
+    this.ROUND_DURATION = 30000;
     this.GAME_STATE_IDLE = 0;
     this.GAME_STATE_ROUND_IN_PROGRESS = 1;
     this.GAME_STATE_WAIT_FOR_NEXT_ROUND = 2;
@@ -57,7 +57,20 @@ class Looper {
       if (foundUser) {
         foundUser.score += 10;
         this._roomEventBridge.broadcastScores(this._users);
+        // TODO: fetch username and passit across. Why should frontend deal with UserId of other users
+        this._roomEventBridge.broadcastLastGuess(
+          userId.split('_')[0],
+          guess,
+          true
+        );
       }
+    } else {
+      // TODO: fetch username and passit across. Why should frontend deal with UserId of other users
+      this._roomEventBridge.broadcastLastGuess(
+        userId.split('_')[0],
+        guess,
+        false
+      );
     }
   }
 

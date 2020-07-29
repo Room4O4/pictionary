@@ -85,3 +85,7 @@
   justify-content: space-around;
   padding: 20px 35px 20px 20px;
 }
+
+.liveMessage {
+  margin-top: -40px;
+}

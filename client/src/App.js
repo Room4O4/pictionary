@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import './App.css';
 import socket from 'socket.io-client';
 import Canvas from './components/Canvas';
@@ -13,6 +13,7 @@ import LogWindow from './components/log-window/LogWindow';
 import UserScoreList from './components/player-list/UserScoreList';
 import PlayersIcon from './components/icons/PlayersIcon';
 import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
+import FadeOutText from './components/anim/FadeOutText';
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);
@@ -42,6 +43,7 @@ function App () {
   const [gameState, setGameState] = useState(GAME_STATE_IDLE);
 
   const [messageLog, setMessageLog] = useState([]);
+  const [lastGuess, setLastGuess] = useState('');
 
   useEffect(() => {
     if (guessBoxRef && guessBoxRef.current) guessBoxRef.current.focus();
@@ -132,6 +134,17 @@ function App () {
             'msgSystem!!!Scores updated!'
           ]);
         });
+
+        io.on('GE_UPDATE_GUESS', (lastGuess) => {
+          let message = '';
+          if (lastGuess.found) {
+            message = `${lastGuess.userName} has found the word!`;
+          } else {
+            message = `${lastGuess.userName} guessed ${lastGuess.guess}`;
+          }
+          setMessageLog((messageLog) => [...messageLog, message]);
+          setLastGuess(message);
+        });
       });
       setSocketIO(io);
     } else {
@@ -162,7 +175,7 @@ function App () {
       resetGuess();
       setMessageLog((messageLog) => [
         ...messageLog,
-        `msgUserGuess!!!${currentUser.id}: ${currentGuess}`
+        `msgUserGuess!!!${currentUser.name}: ${currentGuess}`
       ]);
     }
   };
@@ -214,7 +227,12 @@ function App () {
         </Hidden>
         <Grid item md={6} xs={12}>
           <Grid item xs={12} className="canvasContainer">
-            <Canvas io={socketIO} />
+            <Fragment>
+              <Canvas io={socketIO} />
+              <div className="liveMessage">
+                <FadeOutText text={lastGuess}></FadeOutText>
+              </div>
+            </Fragment>
             {gameState === GAME_STATE_NEW_ROUND ? (
               <div className="timer">
                 <ReactCountdownClock
