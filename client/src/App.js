@@ -273,22 +273,24 @@ function App () {
               <Typography variant="h3">{drawWord}</Typography>
             )}
           </Grid>
-          <Grid item xs={12} className="keyboardContainer">
-            {showGuessBox ? (
-              <Keyboard
-                keyboardRef={(r) => (keyboardRef.current = r)}
-                onChange={onKeyboardInputChange}
-                onKeyPress={onKeyPress}
-                layout={{
-                  default: [
-                    'q w e r t y u i o p',
-                    'a s d f g h k l {enter}',
-                    'z x c v b n m'
-                  ]
-                }}
-              />
-            ) : null}
-          </Grid>
+          <Hidden smUp>
+            <Grid item xs={12} className="keyboardContainer">
+              {showGuessBox ? (
+                <Keyboard
+                  keyboardRef={(r) => (keyboardRef.current = r)}
+                  onChange={onKeyboardInputChange}
+                  onKeyPress={onKeyPress}
+                  layout={{
+                    default: [
+                      'q w e r t y u i o p',
+                      'a s d f g h k l {enter}',
+                      'z x c v b n m'
+                    ]
+                  }}
+                />
+              ) : null}
+            </Grid>
+          </Hidden>
           {previousWord ? (
             <Grid item xs={12}>
               <Typography variant="body1">
