@@ -28,15 +28,6 @@
   color: #61dafb;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .layoutContainer {
   width: "auto";
   max-height: 100vh;
@@ -47,27 +38,22 @@
   margin-right: 30px;
 }
 .canvasContainer {
+  border-radius: 25px;
+  border: 2px solid #21ad4b;
+  margin: 10px;
   position: relative;
   width: 800px;
   height: 533px;
-  padding-right: 20px;
-  padding-left: 20px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  padding-right: 10px;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .inputContainer {
   width: 800px;
   padding-right: 35px;
   padding-left: 20px;
-}
-
-.timer {
-  position: absolute;
-  top: 10px;
-  right: 35px;
-  z-index: 100;
-  padding: inherit;
 }
 
 .playersIcon {
@@ -86,6 +72,3 @@
   padding: 20px 35px 20px 20px;
 }
 
-.liveMessage {
-  margin-top: -40px;
-}

@@ -1,19 +1,18 @@
-import React, { useState, useEffect, useRef, Fragment } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import socket from 'socket.io-client';
-import Canvas from './components/Canvas';
 import { TextField, Hidden } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
 import Typography from '@material-ui/core/Typography';
-import ReactCountdownClock from 'react-countdown-clock';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
 import LogWindow from './components/log-window/LogWindow';
 import UserScoreList from './components/player-list/UserScoreList';
 import PlayersIcon from './components/icons/PlayersIcon';
 import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
-import FadeOutText from './components/anim/FadeOutText';
+import * as GameStateConstants from './constants/AppConstants';
+import GameStateDisplay from './components/game-state-display/GameStateDisplay';
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);
@@ -34,13 +33,9 @@ function App () {
   const keyboardRef = useRef();
   const [roundDuration, setRoundDuration] = useState(0);
 
-  const GAME_STATE_IDLE = 0;
-  const GAME_STATE_NEW_GAME = 1;
-  const GAME_STATE_NEW_ROUND = 2;
-  const GAME_STATE_WAIT_FOR_NEXT_ROUND = 3;
-  const GAME_STATE_ANNOUNCE_WINNER = 4;
-
-  const [gameState, setGameState] = useState(GAME_STATE_IDLE);
+  const [gameState, setGameState] = useState(
+    GameStateConstants.GAME_STATE_IDLE
+  );
 
   const [messageLog, setMessageLog] = useState([]);
   const [lastGuess, setLastGuess] = useState('');
@@ -72,7 +67,7 @@ function App () {
           console.log('New Game starting...');
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
-          setGameState(GAME_STATE_NEW_GAME);
+          setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
           setMessageLog((messageLog) => [
             ...messageLog,
             'msgSystem!!!New Game starting...'
@@ -85,7 +80,7 @@ function App () {
           setShowGuessBox(true);
           setEnableGuessBox(true);
           setPreviousWord(null);
-          setGameState(GAME_STATE_NEW_ROUND);
+          setGameState(GameStateConstants.GAME_STATE_NEW_ROUND);
           console.log(`New Round starting, Round: ${round}, Total: ${total}`);
           setMessageLog((messageLog) => [
             ...messageLog,
@@ -97,7 +92,7 @@ function App () {
           setShowGuessBox(false);
           setDrawWord(null);
           setPreviousWord(previousWord);
-          setGameState(GAME_STATE_WAIT_FOR_NEXT_ROUND);
+          setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
           setMessageLog((messageLog) => [
             ...messageLog,
             'msgSystem!!!Round finished, Wait for next round...'
@@ -110,7 +105,7 @@ function App () {
           console.log('Announce Winner');
           setShowGuessBox(false);
           setDrawWord(null);
-          setGameState(GAME_STATE_ANNOUNCE_WINNER);
+          setGameState(GameStateConstants.GAME_STATE_ANNOUNCE_WINNER);
           setMessageLog((messageLog) => [
             ...messageLog,
             'msgSystemWinner!!!Game Over, And the Winner is...'
@@ -216,6 +211,26 @@ function App () {
     }
   };
 
+  const renderGameState = () => {
+    switch (gameState) {
+      case GameStateConstants.GAME_STATE_IDLE:
+        return <GameStateDisplay gameState={{ state: gameState }} />;
+      case GameStateConstants.GAME_STATE_NEW_ROUND:
+        return (
+          <GameStateDisplay
+            gameState={{
+              state: gameState,
+              socket: socketIO,
+              lastGuess,
+              roundDuration
+            }}
+          />
+        );
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="App">
       <h4>Pictionary</h4>
@@ -227,23 +242,7 @@ function App () {
         </Hidden>
         <Grid item md={6} xs={12}>
           <Grid item xs={12} className="canvasContainer">
-            <Fragment>
-              <Canvas io={socketIO} />
-              <div className="liveMessage">
-                <FadeOutText text={lastGuess}></FadeOutText>
-              </div>
-            </Fragment>
-            {gameState === GAME_STATE_NEW_ROUND ? (
-              <div className="timer">
-                <ReactCountdownClock
-                  className="timer"
-                  seconds={roundDuration}
-                  color="#000"
-                  alpha={0.9}
-                  size={60}
-                />{' '}
-              </div>
-            ) : null}
+            {renderGameState()}
             <Hidden smUp>
               <PlayersIcon
                 onClick={() => {
@@ -266,31 +265,31 @@ function App () {
                 onKeyDown={(e) => guessBoxPressed(e)}
                 onChange={(e) => {
                   setGuess(e.target.value);
-                  keyboardRef.current.setInput(e.target.value);
+                  if (keyboardRef.current) {
+                    keyboardRef.current.setInput(e.target.value);
+                  }
                 }}
               />
             ) : (
               <Typography variant="h3">{drawWord}</Typography>
             )}
           </Grid>
-          <Hidden smUp>
-            <Grid item xs={12} className="keyboardContainer">
-              {showGuessBox ? (
-                <Keyboard
-                  keyboardRef={(r) => (keyboardRef.current = r)}
-                  onChange={onKeyboardInputChange}
-                  onKeyPress={onKeyPress}
-                  layout={{
-                    default: [
-                      'q w e r t y u i o p',
-                      'a s d f g h k l {enter}',
-                      'z x c v b n m'
-                    ]
-                  }}
-                />
-              ) : null}
-            </Grid>
-          </Hidden>
+          <Grid item xs={12} className="keyboardContainer">
+            {showGuessBox ? (
+              <Keyboard
+                keyboardRef={(r) => (keyboardRef.current = r)}
+                onChange={onKeyboardInputChange}
+                onKeyPress={onKeyPress}
+                layout={{
+                  default: [
+                    'q w e r t y u i o p',
+                    'a s d f g h k l {enter}',
+                    'z x c v b n m'
+                  ]
+                }}
+              />
+            ) : null}
+          </Grid>
           {previousWord ? (
             <Grid item xs={12}>
               <Typography variant="body1">

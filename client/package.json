@@ -20,8 +20,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "lint": "eslint $PWD/'src/*.js' $PWD/'src/**/*.js'",
-    "lint:fix": "prettier-eslint $PWD/'src/*.js' $PWD/'src/**/*.js' --write"
+    "lint": "eslint C:/Users/msreeni/Desktop/json-schema/src/*.js C:/Users/msreeni/Desktop/json-schema/src/**/*.js",
+    "lint:fix": "prettier-eslint C:/Users/msreeni/Desktop/json-schema/src/*.js C:/Users/msreeni/Desktop/json-schema/src/**/*.js --write"
   },
   "husky": {
     "hooks": {

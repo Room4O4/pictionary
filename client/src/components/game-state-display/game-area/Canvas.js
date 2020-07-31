@@ -52,20 +52,21 @@ const Canvas = ({ io }) => {
   }
   */
 
+  const clearCanvas = (roundNumber, totalRounds) => {
+    const context = canvasRef.current.getContext('2d');
+    context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  };
+
   useEffect(() => {
     if (io) {
       io.on('S_C_DRAW', onDrawingEvent);
-      io.on('GE_NEW_ROUND', (roundNumber, totalRounds) => {
-        const context = canvasRef.current.getContext('2d');
-        context.clearRect(
-          0,
-          0,
-          canvasRef.current.width,
-          canvasRef.current.height
-        );
-      });
+      io.on('GE_NEW_ROUND', clearCanvas);
     }
-  });
+    return () => {
+      io.off('S_C_DRAW', onDrawingEvent);
+      io.off('GE_NEW_ROUND', clearCanvas);
+    };
+  }, [io]);
 
   // We resize the canvas to set scale once component is loaded
   useEffect(() => {
