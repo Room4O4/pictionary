@@ -32,6 +32,7 @@ function App () {
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
   const [roundDuration, setRoundDuration] = useState(0);
+  const [roundInfo, setRoundInfo] = useState({ current: 0, total: 0 });
 
   const [gameState, setGameState] = useState(
     GameStateConstants.GAME_STATE_IDLE
@@ -80,6 +81,7 @@ function App () {
           setShowGuessBox(true);
           setEnableGuessBox(true);
           setPreviousWord(null);
+          setRoundInfo({ current: total - round + 1, total });
           setGameState(GameStateConstants.GAME_STATE_NEW_ROUND);
           console.log(`New Round starting, Round: ${round}, Total: ${total}`);
           setMessageLog((messageLog) => [
@@ -226,6 +228,10 @@ function App () {
             }}
           />
         );
+      case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
+        return <GameStateDisplay gameState={{ state: gameState, roundInfo }} />;
+      case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
+        return <GameStateDisplay gameState={{ state: gameState }} />;
       default:
         break;
     }
@@ -235,44 +241,49 @@ function App () {
     <div className="App">
       <h4>Pictionary</h4>
       <Grid container className="layoutContainer">
-        <Hidden smDown>
+        <Hidden mdDown>
           <Grid item md={3}>
             <UserScoreList userScores={userScores} />
+            <LogWindow className="logWindow" messages={messageLog}></LogWindow>
           </Grid>
         </Hidden>
-        <Grid item md={6} xs={12}>
-          <Grid item xs={12} className="canvasContainer">
-            {renderGameState()}
-            <Hidden smUp>
-              <PlayersIcon
-                onClick={() => {
-                  setShouldShowPlayersList(true);
-                }}
-                className="playersIcon"
-              />
-            </Hidden>
+        <Grid item md={9} xs={12}>
+          <Grid item xs={12}>
+            <div className="canvasContainer">
+              {renderGameState()}
+              <Hidden smUp>
+                <PlayersIcon
+                  onClick={() => {
+                    setShouldShowPlayersList(true);
+                  }}
+                  className="playersIcon"
+                />
+              </Hidden>
+            </div>
           </Grid>
-          <Grid item xs={12} className="inputContainer">
-            {showGuessBox ? (
-              <TextField
-                className="guessBox"
-                id="txt-guess"
-                ref={guessBoxRef}
-                disabled={!enableGuessBox}
-                label="Guess!"
-                value={guess}
-                variant="outlined"
-                onKeyDown={(e) => guessBoxPressed(e)}
-                onChange={(e) => {
-                  setGuess(e.target.value);
-                  if (keyboardRef.current) {
-                    keyboardRef.current.setInput(e.target.value);
-                  }
-                }}
-              />
-            ) : (
-              <Typography variant="h3">{drawWord}</Typography>
-            )}
+          <Grid item xs={12}>
+            <div className="inputContainer">
+              {showGuessBox ? (
+                <TextField
+                  className="guessBox"
+                  id="txt-guess"
+                  ref={guessBoxRef}
+                  disabled={!enableGuessBox}
+                  label="Guess!"
+                  value={guess}
+                  variant="outlined"
+                  onKeyDown={(e) => guessBoxPressed(e)}
+                  onChange={(e) => {
+                    setGuess(e.target.value);
+                    if (keyboardRef.current) {
+                      keyboardRef.current.setInput(e.target.value);
+                    }
+                  }}
+                />
+              ) : (
+                <Typography variant="h3">{drawWord}</Typography>
+              )}
+            </div>
           </Grid>
           <Grid item xs={12} className="keyboardContainer">
             {showGuessBox ? (
@@ -298,12 +309,6 @@ function App () {
             </Grid>
           ) : null}
         </Grid>
-
-        <Hidden smDown>
-          <Grid item md={3}>
-            <LogWindow className="logWindow" messages={messageLog}></LogWindow>
-          </Grid>
-        </Hidden>
       </Grid>
       {!playerNickname && (
         <AddNicknameDialog onNicknameAdded={onNicknameAdded} />

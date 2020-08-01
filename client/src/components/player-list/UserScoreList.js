@@ -43,7 +43,11 @@ const buildUserList = (userScores) => {
 
 const UserScoreList = ({ userScores }) => {
   console.log(userScores);
-  return <List component="nav">{buildUserList(userScores)}</List>;
+  return (
+    <div className="userScoreList">
+      <List component="nav">{buildUserList(userScores)}</List>
+    </div>
+  );
 };
 
 export default UserScoreList;

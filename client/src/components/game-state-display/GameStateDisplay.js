@@ -23,8 +23,9 @@ const GameStateDisplay = ({ gameState }) => {
         );
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
         return (
-          <Typography className="message-banner" variant="h4">
-            Wait for new round...
+          <Typography className="message-banner" variant="h5">
+            That was Round {gameState.roundInfo.current} of{' '}
+            {gameState.roundInfo.total}. Wait for next round.
           </Typography>
         );
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:

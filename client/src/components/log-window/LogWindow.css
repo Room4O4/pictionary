@@ -1,6 +1,9 @@
 .LogWindow {
   overflow: auto;
-  height: 533px;
+  height: 42vh;
+  border-radius: 25px;
+  margin-left: 20px;
+  border: 2px solid #21ad4b;
 }
 .msgSystem {
   color: black;

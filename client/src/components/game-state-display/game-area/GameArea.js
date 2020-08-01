@@ -8,7 +8,7 @@ const GameArea = ({ socket, lastGuess, roundDuration }) => {
   return (
     <Fragment>
       <Canvas io={socket} />
-      <div className="liveMessage">
+      <div className="live-message">
         <FadeOutText text={lastGuess}></FadeOutText>
       </div>
       <div className="timer">
