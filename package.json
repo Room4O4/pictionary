@@ -23,8 +23,8 @@
   },
   "scripts": {
     "start": "node server/index.js",
-    "lint": "eslint $PWD/'server/*.js' $PWD/'server/**/*.js'",
-    "lint:fix": "prettier-eslint $PWD/'server/*.js' $PWD/'server/**/*.js' --write"
+    "lint": "eslint ./server/*.js ./server/**/*.js",
+    "lint:fix": "eslint ./server/*.js ./server/**/*.js --fix"
   },
   "husky": {
     "hooks": {
