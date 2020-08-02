@@ -73,8 +73,8 @@
   left: 20px;
   z-index: 100;
   padding: inherit;
-  font-size: 50px;
-  color: cornflowerblue;
+  border-radius: 50%;
+  background-color: cornflowerblue;
 }
 
 .keyboardContainer {
