@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import socket from 'socket.io-client';
-import { TextField, Hidden } from '@material-ui/core';
+import { TextField, Hidden, IconButton, Badge } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
@@ -213,6 +213,22 @@ function App () {
     }
   };
 
+  const renderPlayersIcon = () => {
+    return (
+      <Hidden smUp>
+        <div className="playersIconContainer">
+          <IconButton className="playersIconButton" aria-label="players" onClick={() => {
+            setShouldShowPlayersList(true);
+          }}>
+            <Badge badgeContent={userScores ? userScores.length : 0} color="secondary">
+              <PlayersIcon className="playersIcon" />
+            </Badge>
+          </IconButton>
+        </div>
+      </Hidden>
+    );
+  };
+
   const renderGameState = () => {
     switch (gameState) {
       case GameStateConstants.GAME_STATE_IDLE:
@@ -250,15 +266,8 @@ function App () {
         <Grid item md={9} xs={12}>
           <Grid item xs={12}>
             <div className="canvasContainer">
+              {renderPlayersIcon()}
               {renderGameState()}
-              <Hidden smUp>
-                <PlayersIcon
-                  onClick={() => {
-                    setShouldShowPlayersList(true);
-                  }}
-                  className="playersIcon"
-                />
-              </Hidden>
             </div>
           </Grid>
           <Grid item xs={12}>
