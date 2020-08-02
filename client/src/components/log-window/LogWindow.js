@@ -29,11 +29,13 @@ const LogWindow = ({ messages, height }) => {
 
   if (messages && messages.length > 0) {
     return (
-      <List className="LogWindow" ref={listRef}>
-        {messages.map((message, index) => {
-          return renderRow(message, index);
-        })}
-      </List>
+      <div className="LogWindow">
+        <List ref={listRef}>
+          {messages.map((message, index) => {
+            return renderRow(message, index);
+          })}
+        </List>
+      </div>
     );
   } else {
     return null;

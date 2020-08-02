@@ -1,9 +1,13 @@
 
 .userScoreList {
   overflow: auto;
-  max-height: 50%;
-  height: 50%;
+  height: 42vh;
+  margin-bottom: 30px;
+  margin-left:20px;
+  border-radius: 25px;
+  border: 2px solid #21ad4b;
 }
+
 .userScoreListItem {
   display: flex;
   justify-content: space-between;
