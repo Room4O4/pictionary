@@ -253,6 +253,35 @@ function App () {
     }
   };
 
+  const renderKeyboard = () => {
+    return (
+      <Hidden smUp>
+        <Grid item xs={12} className="keyboardContainer">
+          {showGuessBox ? (
+            <Keyboard
+              keyboardRef={(r) => (keyboardRef.current = r)}
+              onChange={onKeyboardInputChange}
+              onKeyPress={onKeyPress}
+              layout={{
+                default: [
+                  'q w e r t y u i o p',
+                  'a s d f g h k l {bksp}',
+                  'z x c v b n m {enter}'
+                ]
+              }}
+              buttonTheme = {[
+                {
+                  class: 'keyboardButton',
+                  buttons: 'q w e r t y u i o p a s d f g h k l {enter} z x c v b n m {bksp}'
+                }
+              ]}
+            />
+          ) : null}
+        </Grid>
+      </Hidden>
+    );
+  };
+
   return (
     <div className="App">
       <h4>Pictionary</h4>
@@ -295,44 +324,29 @@ function App () {
                 )}
               </div>
             </Grid>
-            <Grid item xs={12} className="keyboardContainer">
-              {showGuessBox ? (
-                <Keyboard
-                  keyboardRef={(r) => (keyboardRef.current = r)}
-                  onChange={onKeyboardInputChange}
-                  onKeyPress={onKeyPress}
-                  layout={{
-                    default: [
-                      'q w e r t y u i o p',
-                      'a s d f g h k l {enter}',
-                      'z x c v b n m'
-                    ]
-                  }}
-                />
-              ) : null}
-            </Grid>
+            {renderKeyboard()}
             {previousWord ? (
               <Grid item xs={12}>
                 <Typography variant="body1">
-                Previous word was {previousWord}
+                  Previous word was {previousWord}
                 </Typography>
               </Grid>
             ) : null}
           </Grid>
         </Grid>
-      </Grid>
-      {!playerNickname && (
-        <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-      )}
+        {!playerNickname && (
+          <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
+        )}
 
-      {shouldShowPlayersList && (
-        <UserScoreListDialog
-          userScores={userScores}
-          handleDone={() => {
-            setShouldShowPlayersList(false);
-          }}
-        />
-      )}
+        {shouldShowPlayersList && (
+          <UserScoreListDialog
+            userScores={userScores}
+            handleDone={() => {
+              setShouldShowPlayersList(false);
+            }}
+          />
+        )}
+      </Grid>
     </div>
   );
 }

@@ -73,12 +73,13 @@ body {
 .playersIconContainer {
   width: inherit;
   text-align: start;
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 
 .playersIconButton {
-  position: absolute;
-  margin-top: 20px;
-  margin-left: 20px;
+  position: relative;
   z-index: 100;
 }
 
@@ -88,8 +89,19 @@ body {
 }
 
 .keyboardContainer {
-  display: flex;
-  justify-content: space-around;
-  padding: 20px 35px 20px 20px;
+  padding: 0px 20px 20px 20px;
 }
 
+.keyboardButton {
+  transition: all 0.2s ease-in-out;
+}
+
+.keyboardButton:hover {
+  transform: scale(1.25);
+}
+
+.keyboardButton:active {
+  transform: scale(1.2);
+  color: white;
+  background: blue;
+}
