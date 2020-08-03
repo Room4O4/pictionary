@@ -91,7 +91,16 @@ body {
   padding: 0px 20px 20px 20px;
 }
 
+.keyboardButton {
+  transition: all 0.2s ease-in-out;
+}
+
 .keyboardButton:hover {
-  box-shadow: 0px 15px 20px black;
-  transform: translateY(-3px);
+  transform: scale(1.25);
+}
+
+.keyboardButton:active {
+  transform: scale(1.2);
+  color: white;
+  background: blue;
 }
