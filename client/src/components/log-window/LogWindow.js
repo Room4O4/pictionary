@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import { Paper, Typography } from '@material-ui/core';
 import './LogWindow.css';
 
 const LogWindow = ({ messages, height }) => {
@@ -12,11 +13,11 @@ const LogWindow = ({ messages, height }) => {
 
     return (
       <ListItem alignItems="flex-start">
-        <ListItemText
-          key={index}
-          primary={actualMessage}
-          className={messageType}
-        />
+        <ListItemText>
+          <Typography variant="body2" className={messageType}>
+            {actualMessage}
+          </Typography>
+        </ListItemText>
       </ListItem>
     );
   };
@@ -29,13 +30,13 @@ const LogWindow = ({ messages, height }) => {
 
   if (messages && messages.length > 0) {
     return (
-      <div className="LogWindow">
+      <Paper className="LogWindow" elevation={3}>
         <List ref={listRef}>
           {messages.map((message, index) => {
             return renderRow(message, index);
           })}
         </List>
-      </div>
+      </Paper>
     );
   } else {
     return null;

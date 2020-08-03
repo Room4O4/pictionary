@@ -4,7 +4,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from 'react-avatar';
-import Typography from '@material-ui/core/Typography';
+import { Typography, Paper } from '@material-ui/core';
 
 import './UserScoreList.css';
 
@@ -44,9 +44,9 @@ const buildUserList = (userScores) => {
 const UserScoreList = ({ userScores }) => {
   console.log(userScores);
   return (
-    <div className="userScoreList">
+    <Paper className="userScoreList" elevation={3}>
       <List component="nav">{buildUserList(userScores)}</List>
-    </div>
+    </Paper>
   );
 };
 

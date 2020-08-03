@@ -2,6 +2,10 @@
   text-align: center;
 }
 
+body {
+  background-color: #EDEBE9;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -39,11 +43,9 @@
 }
 
 .canvasContainer {
-  border-radius: 25px;
-  border: 2px solid #21ad4b;
   position: relative;
-  width: 65vh;
-  height: 65vh;
+  width: 75vh;
+  height: 75vh;
   padding-right: 10px;
   padding-left: 10px;
   padding-top: 10px;

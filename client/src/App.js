@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 import socket from 'socket.io-client';
-import { TextField, Hidden, IconButton, Badge } from '@material-ui/core';
+import { TextField, Hidden, IconButton, Badge, Paper } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
 import 'react-simple-keyboard/build/css/index.css';
@@ -281,64 +281,66 @@ function App () {
       <h4>Pictionary</h4>
       <Grid container className="layoutContainer">
         <Hidden mdDown>
-          <Grid item md={3}>
+          <Grid item md={3} lg={4}>
             <UserScoreList userScores={userScores} />
             <LogWindow className="logWindow" messages={messageLog}></LogWindow>
           </Grid>
         </Hidden>
-        <Grid item md={9} xs={12}>
-          <Grid item xs={12}>
-            <div className="canvasContainer">
-              {renderPlayersIcon()}
-              {renderGameState()}
-            </div>
-          </Grid>
-          <Grid item xs={12}>
-            <div className="inputContainer">
-              {showGuessBox ? (
-                <TextField
-                  className="guessBox"
-                  id="txt-guess"
-                  ref={guessBoxRef}
-                  disabled={!enableGuessBox}
-                  label="Guess!"
-                  value={guess}
-                  variant="outlined"
-                  onKeyDown={(e) => guessBoxPressed(e)}
-                  onChange={(e) => {
-                    setGuess(e.target.value);
-                    if (keyboardRef.current) {
-                      keyboardRef.current.setInput(e.target.value);
-                    }
-                  }}
-                />
-              ) : (
-                <Typography variant="h3">{drawWord}</Typography>
-              )}
-            </div>
-          </Grid>
-          {renderKeyboard()}
-          {previousWord ? (
+        <Grid item md={12} lg={8}>
+          <Grid container>
             <Grid item xs={12}>
-              <Typography variant="body1">
-                Previous word was {previousWord}
-              </Typography>
+              <Paper elevation={3} className="canvasContainer">
+                {renderPlayersIcon()}
+                {renderGameState()}
+              </Paper>
             </Grid>
-          ) : null}
+            <Grid item xs={12}>
+              <div className="inputContainer">
+                {showGuessBox ? (
+                  <TextField
+                    className="guessBox"
+                    id="txt-guess"
+                    ref={guessBoxRef}
+                    disabled={!enableGuessBox}
+                    label="Guess!"
+                    value={guess}
+                    variant="outlined"
+                    onKeyDown={(e) => guessBoxPressed(e)}
+                    onChange={(e) => {
+                      setGuess(e.target.value);
+                      if (keyboardRef.current) {
+                        keyboardRef.current.setInput(e.target.value);
+                      }
+                    }}
+                  />
+                ) : (
+                  <Typography variant="h3">{drawWord}</Typography>
+                )}
+              </div>
+            </Grid>
+            {renderKeyboard()}
+            {previousWord ? (
+              <Grid item xs={12}>
+                <Typography variant="body1">
+                  Previous word was {previousWord}
+                </Typography>
+              </Grid>
+            ) : null}
+          </Grid>
         </Grid>
-      </Grid>
-      {!playerNickname && (
-        <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-      )}
+        {!playerNickname && (
+          <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
+        )}
 
-      {shouldShowPlayersList && (
-        <UserScoreListDialog
-          userScores={userScores}
-          handleDone={() => {
-            setShouldShowPlayersList(false);
-          }}
-        />
-      )}
+        {shouldShowPlayersList && (
+          <UserScoreListDialog
+            userScores={userScores}
+            handleDone={() => {
+              setShouldShowPlayersList(false);
+            }}
+          />
+        )}
+      </Grid>
     </div>
   );
 }
