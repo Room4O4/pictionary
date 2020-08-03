@@ -187,7 +187,9 @@ function App () {
 
   const resetGuess = () => {
     setGuess('');
-    keyboardRef.current.setInput('');
+    if (keyboardRef.current) {
+      keyboardRef.current.setInput('');
+    }
   };
 
   useEffect(() => {
