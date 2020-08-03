@@ -73,12 +73,13 @@ body {
 .playersIconContainer {
   width: inherit;
   text-align: start;
+  position: absolute;
+  top: 20px;
+  left: 20px;
 }
 
 .playersIconButton {
-  position: absolute;
-  margin-top: 20px;
-  margin-left: 20px;
+  position: relative;
   z-index: 100;
 }
 
