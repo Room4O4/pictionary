@@ -13,6 +13,7 @@ import PlayersIcon from './components/icons/PlayersIcon';
 import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
 import * as GameStateConstants from './constants/AppConstants';
 import GameStateDisplay from './components/game-state-display/GameStateDisplay';
+import { OnScreenKeyboardLayout, OnScreenKeyboardDisplay } from './constants/KeyboardLayout';
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);
@@ -21,6 +22,8 @@ function App () {
   const [playerNickname, setPlayerNickname] = useState(null);
 
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
+
+  const [layoutName, setLayoutName] = useState('default');
 
   const [showGuessBox, setShowGuessBox] = useState(false);
   const [enableGuessBox, setEnableGuessBox] = useState(false);
@@ -203,16 +206,26 @@ function App () {
   };
 
   const onKeyboardInputChange = (input) => {
-    console.log('Input changed', input);
     setGuess(input);
   };
 
   const onKeyPress = (button) => {
-    console.log('Button pressed', button);
-    if (button === '{enter}') {
+    if (button === '{ent}') {
       sendGuessToServer();
       resetGuess();
+    } else if (button === '{shift}' || button === '{lock}') {
+      handleShift();
+    } else if (button === '{numbers}' || button === '{abc}') {
+      handleNumbers();
     }
+  };
+
+  const handleShift = () => {
+    setLayoutName(layoutName === 'default' ? 'shift' : 'default');
+  };
+
+  const handleNumbers = () => {
+    setLayoutName(layoutName === 'default' ? 'numbers' : 'default');
   };
 
   const renderPlayersIcon = () => {
@@ -264,19 +277,10 @@ function App () {
               keyboardRef={(r) => (keyboardRef.current = r)}
               onChange={onKeyboardInputChange}
               onKeyPress={onKeyPress}
-              layout={{
-                default: [
-                  'q w e r t y u i o p',
-                  'a s d f g h k l {bksp}',
-                  'z x c v b n m {enter}'
-                ]
-              }}
-              buttonTheme = {[
-                {
-                  class: 'keyboardButton',
-                  buttons: 'q w e r t y u i o p a s d f g h k l {enter} z x c v b n m {bksp}'
-                }
-              ]}
+              mergeDisplay={true}
+              layoutName={layoutName}
+              layout={OnScreenKeyboardLayout}
+              display= {OnScreenKeyboardDisplay}
             />
           ) : null}
         </Grid>
