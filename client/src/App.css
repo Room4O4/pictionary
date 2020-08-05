@@ -89,19 +89,10 @@ body {
 }
 
 .keyboardContainer {
-  padding: 0px 20px 20px 20px;
+  padding: 5px 10px 5px 10px;
 }
 
 .keyboardButton {
-  transition: all 0.2s ease-in-out;
+  min-width: 25px;
 }
 
-.keyboardButton:hover {
-  transform: scale(1.25);
-}
-
-.keyboardButton:active {
-  transform: scale(1.2);
-  color: white;
-  background: blue;
-}
