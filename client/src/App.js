@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
 import socket from 'socket.io-client';
 import { TextField, Hidden, IconButton, Badge, Paper } from '@material-ui/core';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
-import 'react-simple-keyboard/build/css/index.css';
 import Typography from '@material-ui/core/Typography';
+
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
 import LogWindow from './components/log-window/LogWindow';
 import UserScoreList from './components/player-list/UserScoreList';
@@ -15,34 +15,33 @@ import * as GameStateConstants from './constants/AppConstants';
 import GameStateDisplay from './components/game-state-display/GameStateDisplay';
 import { OnScreenKeyboardLayout, OnScreenKeyboardDisplay } from './constants/KeyboardLayout';
 
+import './App.css';
+import 'react-simple-keyboard/build/css/index.css';
+
 function App () {
   const [socketIO, setSocketIO] = useState(null);
   const [drawWord, setDrawWord] = useState(null);
-
   const [playerNickname, setPlayerNickname] = useState(null);
-
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
-
   const [layoutName, setLayoutName] = useState('default');
-
   const [showGuessBox, setShowGuessBox] = useState(false);
-  const [enableGuessBox, setEnableGuessBox] = useState(false);
-
+  const [disableGuessBox, setDisableGuessBox] = useState(true);
   const [guess, setGuess] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const [userScores, setUserScores] = useState(null);
   const [previousWord, setPreviousWord] = useState(null);
-  const guessBoxRef = useRef(null);
-  const keyboardRef = useRef();
   const [roundDuration, setRoundDuration] = useState(0);
   const [roundInfo, setRoundInfo] = useState({ current: 0, total: 0 });
-
   const [gameState, setGameState] = useState(
     GameStateConstants.GAME_STATE_IDLE
   );
-
   const [messageLog, setMessageLog] = useState([]);
   const [lastGuess, setLastGuess] = useState('');
+
+  const guessBoxRef = useRef(null);
+  const keyboardRef = useRef();
+
+  const isOnscreenKeyboardVisible = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
     if (guessBoxRef && guessBoxRef.current) guessBoxRef.current.focus();
@@ -82,7 +81,7 @@ function App () {
           setDrawWord(null);
           setGuess('');
           setShowGuessBox(true);
-          setEnableGuessBox(true);
+          setDisableGuessBox(false);
           setPreviousWord(null);
           setRoundInfo({ current: total - round + 1, total });
           setGameState(GameStateConstants.GAME_STATE_NEW_ROUND);
@@ -161,11 +160,17 @@ function App () {
       if (latestUserScore > currentUser.score) {
         console.log('Disable guess box');
         // disable guess box if guess is right
-        setEnableGuessBox(false);
+        setDisableGuessBox(true);
         currentUser.score = latestUserScore;
       }
     }
   }, [userScores, currentUser]);
+
+  useEffect(() => {
+    document.body.addEventListener('touchmove', function (e) {
+      // e.preventDefault();
+    });
+  }, []);
 
   const guessBoxPressed = (e) => {
     if (e.keyCode === 13) {
@@ -194,12 +199,6 @@ function App () {
       keyboardRef.current.setInput('');
     }
   };
-
-  useEffect(() => {
-    document.body.addEventListener('touchmove', function (e) {
-      // e.preventDefault();
-    });
-  }, []);
 
   const onNicknameAdded = (nickname) => {
     setPlayerNickname(nickname);
@@ -313,7 +312,7 @@ function App () {
                     className="guessBox"
                     id="txt-guess"
                     ref={guessBoxRef}
-                    disabled={!enableGuessBox}
+                    disabled={disableGuessBox || isOnscreenKeyboardVisible}
                     label="Guess!"
                     value={guess}
                     variant="outlined"
