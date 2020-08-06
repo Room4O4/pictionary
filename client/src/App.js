@@ -276,6 +276,7 @@ function App () {
               keyboardRef={(r) => (keyboardRef.current = r)}
               onChange={onKeyboardInputChange}
               onKeyPress={onKeyPress}
+              autoUseTouchEvents={true}
               mergeDisplay={true}
               layoutName={layoutName}
               layout={OnScreenKeyboardLayout}
