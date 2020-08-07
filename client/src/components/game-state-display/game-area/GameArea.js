@@ -15,9 +15,10 @@ const GameArea = ({ socket, lastGuess, roundDuration }) => {
         <ReactCountdownClock
           className="timer"
           seconds={roundDuration}
-          color="#000"
+          color="#D28152"
+          weight={5}
           alpha={0.9}
-          size={60}
+          size={48}
         />{' '}
       </div>
     </Fragment>

@@ -82,8 +82,8 @@ body {
   width: inherit;
   text-align: start;
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 10px;
+  left: 10px;
 }
 
 .playersIconButton {
@@ -93,7 +93,7 @@ body {
 
 .playersIcon {
   border-radius: 50%;
-  background-color: var(--secondaryColor);
+  background-color: var(--primaryColor);
 }
 
 .keyboardContainer {
