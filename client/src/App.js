@@ -7,9 +7,9 @@ import Keyboard from 'react-simple-keyboard';
 import Typography from '@material-ui/core/Typography';
 import MenuIcon from '@material-ui/icons/Menu';
 
-import AppBar from './components/appbar/PictionaryAppBar';
+import AppBar from './components/appbar';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
-import LogWindow from './components/log-window/LogWindow';
+import LogWindow from './components/log-window';
 import UserScoreList from './components/player-list/UserScoreList';
 import PlayersIcon from './components/icons/PlayersIcon';
 import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
