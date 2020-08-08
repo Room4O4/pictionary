@@ -39,6 +39,16 @@ io.on('connection', (socket) => {
       socket.disconnect();
     }
   });
+
+  socket.on('C_S_CLEAR_CANVAS', async (room) => {
+    try {
+      debug('Received C_S_CLEAR_CANVAS');
+      // Broadcast to every one in room for clearing canvas. (including the sender)
+      io.in(room).emit('S_C_CLEAR_CANVAS');
+    } catch (error) {
+      debug('Error in handling C_S_CLEAR_CANVAS', error);
+    }
+  });
 });
 
 const updateServerTime = (socket) => {

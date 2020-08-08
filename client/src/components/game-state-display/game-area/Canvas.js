@@ -61,10 +61,12 @@ const Canvas = ({ io, canvasOptions }) => {
     if (io) {
       io.on('S_C_DRAW', onDrawingEvent);
       io.on('GE_NEW_ROUND', clearCanvas);
+      io.on('S_C_CLEAR_CANVAS', clearCanvas);
     }
     return () => {
       io.off('S_C_DRAW', onDrawingEvent);
       io.off('GE_NEW_ROUND', clearCanvas);
+      io.off('S_C_CLEAR_CANVAS', clearCanvas);
     };
   }, [io]);
 

@@ -21,8 +21,11 @@ import './App.css';
 import 'react-simple-keyboard/build/css/index.css';
 import CanvasToolbox from './components/toolbox';
 
+const DEFAULT_ROOM = 'main';
+
 function App () {
   const [socketIO, setSocketIO] = useState(null);
+  const [room, setRoom] = useState(DEFAULT_ROOM);
   const [drawWord, setDrawWord] = useState(null);
   const [playerNickname, setPlayerNickname] = useState(null);
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
@@ -62,7 +65,7 @@ function App () {
           name: `${playerNickname}`,
           score: 0
         };
-        io.emit('C_S_LOGIN', user);
+        io.emit('C_S_LOGIN', user, room);
         io.on('S_C_LOGIN', () => {
           console.log('Login success');
           setCurrentUser(user);
@@ -151,6 +154,10 @@ function App () {
           setLastGuess(message);
         });
       });
+      // Currently adding this line to prevent link check fails as setRoom is unused.
+      // Once Rooms feature is implemented, this shall be used
+      setRoom(room);
+
       setSocketIO(io);
     } else {
       console.log('playerNickname is null');
@@ -239,6 +246,10 @@ function App () {
     });
   };
 
+  const handleClearCanvas = () => {
+    socketIO.emit('C_S_CLEAR_CANVAS', room);
+  };
+
   const renderPlayersIcon = () => {
     return (
       <Hidden smUp>
@@ -304,7 +315,7 @@ function App () {
   const renderCanvasToolbox = () => {
     console.log(`showGuessBox ${showGuessBox}, gamestate ${gameState}`);
     if (gameState === GameStateConstants.GAME_STATE_NEW_ROUND && !showGuessBox) {
-      return <CanvasToolbox onColorChanged={handleColorChange} />;
+      return <CanvasToolbox onColorChanged={handleColorChange} onClearCanvasPressed={handleClearCanvas} />;
     } else {
       return null;
     }
