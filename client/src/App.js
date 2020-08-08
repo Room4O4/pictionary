@@ -19,6 +19,7 @@ import { OnScreenKeyboardLayout, OnScreenKeyboardDisplay } from './constants/Key
 
 import './App.css';
 import 'react-simple-keyboard/build/css/index.css';
+import CanvasToolbox from './components/toolbox';
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);
@@ -290,6 +291,15 @@ function App () {
     );
   };
 
+  const renderCanvasToolbox = () => {
+    console.log(`showGuessBox ${showGuessBox}, gamestate ${gameState}`);
+    if (gameState === GameStateConstants.GAME_STATE_NEW_ROUND && !showGuessBox) {
+      return <CanvasToolbox/>;
+    } else {
+      return null;
+    }
+  };
+
   return (
     <div className="App">
       <AppBar position="static" color="primary">
@@ -304,12 +314,12 @@ function App () {
       </AppBar>
       <Grid container className="layoutContainer">
         <Hidden mdDown>
-          <Grid item md={3} lg={4}>
+          <Grid item md={3} lg={3}>
             <UserScoreList userScores={userScores} />
             <LogWindow className="logWindow" messages={messageLog}></LogWindow>
           </Grid>
         </Hidden>
-        <Grid item md={12} lg={8}>
+        <Grid item md={12} lg={6}>
           <Grid container>
             <Grid item xs={12}>
               <Paper elevation={3} className="canvasContainer">
@@ -338,7 +348,7 @@ function App () {
                     }}
                   />
                 ) : (
-                  <Typography variant="h3">{drawWord}</Typography>
+                  <Typography variant="h5">{drawWord}</Typography>
                 )}
               </div>
             </Grid>
@@ -351,6 +361,9 @@ function App () {
               </Grid>
             ) : null}
           </Grid>
+        </Grid>
+        <Grid item xs={12} sm={12} md={12} lg={3}>
+          {renderCanvasToolbox()}
         </Grid>
         {!playerNickname && (
           <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
