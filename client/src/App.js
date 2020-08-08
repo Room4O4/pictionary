@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socket from 'socket.io-client';
-import { TextField, Hidden, IconButton, Badge, Paper } from '@material-ui/core';
+import { TextField, Hidden, IconButton, Badge, Paper, Toolbar } from '@material-ui/core';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
 import Typography from '@material-ui/core/Typography';
+import MenuIcon from '@material-ui/icons/Menu';
 
+import AppBar from './components/appbar/PictionaryAppBar';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
 import LogWindow from './components/log-window/LogWindow';
 import UserScoreList from './components/player-list/UserScoreList';
@@ -290,7 +292,16 @@ function App () {
 
   return (
     <div className="App">
-      <h4>Pictionary</h4>
+      <AppBar position="static" color="primary">
+        <Toolbar>
+          <IconButton edge="start" color="inherit" aria-label="menu">
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6">
+              Pictionary
+          </Typography>
+        </Toolbar>
+      </AppBar>
       <Grid container className="layoutContainer">
         <Hidden mdDown>
           <Grid item md={3} lg={4}>
