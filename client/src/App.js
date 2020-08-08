@@ -49,7 +49,7 @@ function App () {
 
   useEffect(() => {
     if (playerNickname) {
-      const io = socket('http://localhost:3001');
+      const io = socket('http://192.168.1.6:3001');
       io.on('connect', () => {
         const user = {
           id: `${playerNickname}_${+new Date()}`,
@@ -312,6 +312,7 @@ function App () {
                   <TextField
                     className="guessBox"
                     id="txt-guess"
+                    size="small"
                     ref={guessBoxRef}
                     disabled={disableGuessBox || isOnscreenKeyboardVisible}
                     label="Guess!"

@@ -41,29 +41,25 @@ body {
 }
 
 .layoutContainer {
-  width: "auto";
+  width: auto;
   max-height: 100vh;
 }
 
 .guessBox {
   width: 100%;
-  margin-right: 30px;
+  background-color: white;
 }
 
 .canvasContainer {
   position: relative;
   width: 75vh;
   height: 75vh;
-  padding-right: 10px;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
   margin: auto;
 }
 
 .inputContainer {
-  width: 65vh;
-  padding: 10px;
+  position: relative;
+  width: 75vh;
   margin: auto;
 }
 
