@@ -1,9 +1,17 @@
+html {
+  --primaryColor: #D28152;
+  --secondaryColor: #DCB26B;
+  --backgroundColor: #EDEBE9;
+  --linksColor: #70B5E0;
+  --buttonColor: linear-gradient(to bottom, #d1e4f6 0%, #c5d8e9 100%);
+}
+
 .App {
   text-align: center;
 }
 
 body {
-  background-color: #EDEBE9;
+  background-color: var(--backgroundColor);
 }
 
 .App-logo {
@@ -74,8 +82,8 @@ body {
   width: inherit;
   text-align: start;
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 10px;
+  left: 10px;
 }
 
 .playersIconButton {
@@ -85,7 +93,7 @@ body {
 
 .playersIcon {
   border-radius: 50%;
-  background-color: cornflowerblue;
+  background-color: var(--primaryColor);
 }
 
 .keyboardContainer {
