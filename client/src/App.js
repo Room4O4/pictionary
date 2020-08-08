@@ -38,6 +38,9 @@ function App () {
   const [gameState, setGameState] = useState(
     GameStateConstants.GAME_STATE_IDLE
   );
+  const [canvasOptions, setCanvasOptions] = useState({
+    color: '#000000'
+  });
   const [messageLog, setMessageLog] = useState([]);
   const [lastGuess, setLastGuess] = useState('');
 
@@ -230,6 +233,12 @@ function App () {
     setLayoutName(layoutName === 'default' ? 'numbers' : 'default');
   };
 
+  const handleColorChange = (color) => {
+    setCanvasOptions({
+      color: color
+    });
+  };
+
   const renderPlayersIcon = () => {
     return (
       <Hidden smUp>
@@ -259,6 +268,7 @@ function App () {
               lastGuess,
               roundDuration
             }}
+            canvasOptions={canvasOptions}
           />
         );
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
@@ -294,7 +304,7 @@ function App () {
   const renderCanvasToolbox = () => {
     console.log(`showGuessBox ${showGuessBox}, gamestate ${gameState}`);
     if (gameState === GameStateConstants.GAME_STATE_NEW_ROUND && !showGuessBox) {
-      return <CanvasToolbox/>;
+      return <CanvasToolbox onColorChanged={handleColorChange} />;
     } else {
       return null;
     }

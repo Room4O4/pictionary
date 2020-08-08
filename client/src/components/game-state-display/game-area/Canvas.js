@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import './canvas.css';
 
-const Canvas = ({ io }) => {
+const Canvas = ({ io, canvasOptions }) => {
   let drawing = false;
   const current = { x: 0, y: 0 };
   const canvasRef = useRef(null);
@@ -137,7 +137,7 @@ const Canvas = ({ io }) => {
 
     var x = (inputX - rect.left) * scaleX; // x position within the element.
     var y = (inputY - rect.top) * scaleY; // y position within the element.
-    drawLine(current.x, current.y, x, y, current.color, true);
+    drawLine(current.x, current.y, x, y, canvasOptions.color, true);
   }
 
   function onMouseMove (e) {
@@ -152,7 +152,7 @@ const Canvas = ({ io }) => {
     var x = (inputX - rect.left) * scaleX; // x position within the element.
     var y = (inputY - rect.top) * scaleY; // y position within the element.
 
-    drawLine(current.x, current.y, x, y, current.color, true);
+    drawLine(current.x, current.y, x, y, canvasOptions.color, true);
     current.x = x;
     current.y = y;
   }
