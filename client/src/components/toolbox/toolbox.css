@@ -9,7 +9,7 @@
 
 @media only screen and (max-width: 600px) {
   .toolboxContainer {
-    padding-top: 20px;
+    padding-top: 10px;
     width: 90vw;
     margin: auto;
   }

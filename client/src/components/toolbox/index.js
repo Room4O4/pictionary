@@ -7,7 +7,7 @@ import UIButton from '../button';
 const CanvasToolbox = ({ onColorChanged, onClearCanvasPressed }) => {
   return (
     <Paper elevation={3} className="toolboxContainer">
-      <Grid container direction="column" spacing={3} xs={12}>
+      <Grid container direction="column" spacing={2} xs={12}>
         <Grid item xs={12}>
           <UIButton variant="contained" onClick={onClearCanvasPressed}>Clear canvas </UIButton>
         </Grid>
