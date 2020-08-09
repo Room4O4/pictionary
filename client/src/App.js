@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socket from 'socket.io-client';
-import { TextField, Hidden, IconButton, Badge, Paper, Toolbar } from '@material-ui/core';
+import { TextField, Hidden, IconButton, Badge, Paper, Toolbar, SvgIcon } from '@material-ui/core';
 import { StylesProvider } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
 import Typography from '@material-ui/core/Typography';
-import MenuIcon from '@material-ui/icons/Menu';
+import { ReactComponent as AppLogo } from './assets/logo.svg';
 
 import AppBar from './components/appbar';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
@@ -328,7 +328,7 @@ function App () {
         <AppBar position="static" color="primary">
           <Toolbar>
             <IconButton edge="start" color="inherit" aria-label="menu">
-              <MenuIcon />
+              <SvgIcon fontSize="large" component={AppLogo} viewBox="0 0 48 48" width="48" height="48"/>
             </IconButton>
             <Typography variant="h6">
               Pictionary
