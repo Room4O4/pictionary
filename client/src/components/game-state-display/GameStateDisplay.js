@@ -4,7 +4,7 @@ import * as GameStateConstants from '../../constants/AppConstants';
 import GameArea from './game-area/GameArea';
 import './game-state-display.css';
 
-const GameStateDisplay = ({ gameState }) => {
+const GameStateDisplay = ({ gameState, canvasOptions }) => {
   const renderGameState = () => {
     switch (gameState.state) {
       case GameStateConstants.GAME_STATE_IDLE:
@@ -19,6 +19,7 @@ const GameStateDisplay = ({ gameState }) => {
             socket={gameState.socket}
             lastGuess={gameState.lastGuess}
             roundDuration={gameState.roundDuration}
+            canvasOptions={canvasOptions}
           />
         );
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:

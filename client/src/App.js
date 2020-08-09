@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socket from 'socket.io-client';
-import { TextField, Hidden, IconButton, Badge, Paper, Toolbar } from '@material-ui/core';
+import { TextField, Hidden, IconButton, Badge, Paper, Toolbar, SvgIcon } from '@material-ui/core';
+import { StylesProvider } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
 import Typography from '@material-ui/core/Typography';
-import MenuIcon from '@material-ui/icons/Menu';
+import { ReactComponent as AppLogo } from './assets/logo.svg';
 
 import AppBar from './components/appbar';
 import AddNicknameDialog from './components/dialogs/AddNicknameDialog';
@@ -19,9 +20,13 @@ import { OnScreenKeyboardLayout, OnScreenKeyboardDisplay } from './constants/Key
 
 import './App.css';
 import 'react-simple-keyboard/build/css/index.css';
+import CanvasToolbox from './components/toolbox';
+
+const DEFAULT_ROOM = 'main';
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);
+  const [room, setRoom] = useState(DEFAULT_ROOM);
   const [drawWord, setDrawWord] = useState(null);
   const [playerNickname, setPlayerNickname] = useState(null);
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
@@ -37,6 +42,9 @@ function App () {
   const [gameState, setGameState] = useState(
     GameStateConstants.GAME_STATE_IDLE
   );
+  const [canvasOptions, setCanvasOptions] = useState({
+    color: '#000000'
+  });
   const [messageLog, setMessageLog] = useState([]);
   const [lastGuess, setLastGuess] = useState('');
 
@@ -58,7 +66,7 @@ function App () {
           name: `${playerNickname}`,
           score: 0
         };
-        io.emit('C_S_LOGIN', user);
+        io.emit('C_S_LOGIN', user, room);
         io.on('S_C_LOGIN', () => {
           console.log('Login success');
           setCurrentUser(user);
@@ -147,6 +155,10 @@ function App () {
           setLastGuess(message);
         });
       });
+      // Currently adding this line to prevent link check fails as setRoom is unused.
+      // Once Rooms feature is implemented, this shall be used
+      setRoom(room);
+
       setSocketIO(io);
     } else {
       console.log('playerNickname is null');
@@ -229,6 +241,16 @@ function App () {
     setLayoutName(layoutName === 'default' ? 'numbers' : 'default');
   };
 
+  const handleColorChange = (color) => {
+    setCanvasOptions({
+      color: color
+    });
+  };
+
+  const handleClearCanvas = () => {
+    socketIO.emit('C_S_CLEAR_CANVAS', room);
+  };
+
   const renderPlayersIcon = () => {
     return (
       <Hidden smUp>
@@ -258,6 +280,7 @@ function App () {
               lastGuess,
               roundDuration
             }}
+            canvasOptions={canvasOptions}
           />
         );
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
@@ -290,82 +313,96 @@ function App () {
     );
   };
 
-  return (
-    <div className="App">
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6">
-              Pictionary
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Grid container className="layoutContainer">
-        <Hidden mdDown>
-          <Grid item md={3} lg={4}>
-            <UserScoreList userScores={userScores} />
-            <LogWindow className="logWindow" messages={messageLog}></LogWindow>
-          </Grid>
-        </Hidden>
-        <Grid item md={12} lg={8}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Paper elevation={3} className="canvasContainer">
-                {renderPlayersIcon()}
-                {renderGameState()}
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <div className="inputContainer">
-                {showGuessBox ? (
-                  <TextField
-                    className="guessBox"
-                    id="txt-guess"
-                    size="small"
-                    ref={guessBoxRef}
-                    disabled={disableGuessBox || isOnscreenKeyboardVisible}
-                    label="Guess!"
-                    value={guess}
-                    variant="outlined"
-                    onKeyDown={(e) => guessBoxPressed(e)}
-                    onChange={(e) => {
-                      setGuess(e.target.value);
-                      if (keyboardRef.current) {
-                        keyboardRef.current.setInput(e.target.value);
-                      }
-                    }}
-                  />
-                ) : (
-                  <Typography variant="h3">{drawWord}</Typography>
-                )}
-              </div>
-            </Grid>
-            {renderKeyboard()}
-            {previousWord ? (
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  Previous word was {previousWord}
-                </Typography>
-              </Grid>
-            ) : null}
-          </Grid>
-        </Grid>
-        {!playerNickname && (
-          <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-        )}
+  const renderCanvasToolbox = () => {
+    console.log(`showGuessBox ${showGuessBox}, gamestate ${gameState}`);
+    if (gameState === GameStateConstants.GAME_STATE_NEW_ROUND && !showGuessBox) {
+      return <CanvasToolbox onColorChanged={handleColorChange} onClearCanvasPressed={handleClearCanvas} />;
+    } else {
+      return null;
+    }
+  };
 
-        {shouldShowPlayersList && (
-          <UserScoreListDialog
-            userScores={userScores}
-            handleDone={() => {
-              setShouldShowPlayersList(false);
-            }}
-          />
-        )}
-      </Grid>
-    </div>
+  return (
+    <StylesProvider injectFirst>
+      <div className="App">
+        <AppBar position="static" color="primary">
+          <Toolbar>
+            <IconButton edge="start" color="inherit" aria-label="menu">
+              <SvgIcon fontSize="large" component={AppLogo} viewBox="0 0 48 48" width="48" height="48"/>
+            </IconButton>
+            <Typography variant="h6">
+              Pictionary
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Grid container className="layoutContainer">
+          <Hidden mdDown>
+            <Grid item md={3} lg={3}>
+              <UserScoreList userScores={userScores} />
+              <LogWindow className="logWindow" messages={messageLog}></LogWindow>
+            </Grid>
+          </Hidden>
+          <Grid item md={12} lg={6}>
+            <Grid container>
+              <Grid item xs={12}>
+                <Paper elevation={3} className="canvasContainer">
+                  {renderPlayersIcon()}
+                  {renderGameState()}
+                </Paper>
+              </Grid>
+              <Grid item xs={12}>
+                <div className="inputContainer">
+                  {showGuessBox ? (
+                    <TextField
+                      className="guessBox"
+                      id="txt-guess"
+                      size="small"
+                      ref={guessBoxRef}
+                      disabled={disableGuessBox || isOnscreenKeyboardVisible}
+                      label="Guess!"
+                      value={guess}
+                      variant="outlined"
+                      onKeyDown={(e) => guessBoxPressed(e)}
+                      onChange={(e) => {
+                        setGuess(e.target.value);
+                        if (keyboardRef.current) {
+                          keyboardRef.current.setInput(e.target.value);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <Typography variant="h5">{drawWord}</Typography>
+                  )}
+                </div>
+              </Grid>
+              {renderKeyboard()}
+              {previousWord ? (
+                <Grid item xs={12}>
+                  <Typography variant="body1">
+                  Previous word was {previousWord}
+                  </Typography>
+                </Grid>
+              ) : null}
+            </Grid>
+          </Grid>
+          <Grid item xs={12} sm={12} md={12} lg={3}>
+            {renderCanvasToolbox()}
+          </Grid>
+          {!playerNickname && (
+            <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
+          )}
+
+          {shouldShowPlayersList && (
+            <UserScoreListDialog
+              userScores={userScores}
+              handleDone={() => {
+                setShouldShowPlayersList(false);
+              }}
+            />
+          )}
+        </Grid>
+      </div>
+    </StylesProvider>
   );
 }
 

@@ -1,7 +1,8 @@
 .LogWindow {
   overflow: auto;
   height: 42vh;
-  margin-left:40%;
+  margin-left:10%;
+  margin-right:10%;
 }
 
 .msgSystem {
