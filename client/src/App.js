@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socket from 'socket.io-client';
 import { TextField, Hidden, IconButton, Badge, Paper, Toolbar } from '@material-ui/core';
+import { StylesProvider } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
@@ -322,84 +323,86 @@ function App () {
   };
 
   return (
-    <div className="App">
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <IconButton edge="start" color="inherit" aria-label="menu">
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6">
+    <StylesProvider injectFirst>
+      <div className="App">
+        <AppBar position="static" color="primary">
+          <Toolbar>
+            <IconButton edge="start" color="inherit" aria-label="menu">
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6">
               Pictionary
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Grid container className="layoutContainer">
-        <Hidden mdDown>
-          <Grid item md={3} lg={3}>
-            <UserScoreList userScores={userScores} />
-            <LogWindow className="logWindow" messages={messageLog}></LogWindow>
-          </Grid>
-        </Hidden>
-        <Grid item md={12} lg={6}>
-          <Grid container>
-            <Grid item xs={12}>
-              <Paper elevation={3} className="canvasContainer">
-                {renderPlayersIcon()}
-                {renderGameState()}
-              </Paper>
+            </Typography>
+          </Toolbar>
+        </AppBar>
+        <Grid container className="layoutContainer">
+          <Hidden mdDown>
+            <Grid item md={3} lg={3}>
+              <UserScoreList userScores={userScores} />
+              <LogWindow className="logWindow" messages={messageLog}></LogWindow>
             </Grid>
-            <Grid item xs={12}>
-              <div className="inputContainer">
-                {showGuessBox ? (
-                  <TextField
-                    className="guessBox"
-                    id="txt-guess"
-                    size="small"
-                    ref={guessBoxRef}
-                    disabled={disableGuessBox || isOnscreenKeyboardVisible}
-                    label="Guess!"
-                    value={guess}
-                    variant="outlined"
-                    onKeyDown={(e) => guessBoxPressed(e)}
-                    onChange={(e) => {
-                      setGuess(e.target.value);
-                      if (keyboardRef.current) {
-                        keyboardRef.current.setInput(e.target.value);
-                      }
-                    }}
-                  />
-                ) : (
-                  <Typography variant="h5">{drawWord}</Typography>
-                )}
-              </div>
-            </Grid>
-            {renderKeyboard()}
-            {previousWord ? (
+          </Hidden>
+          <Grid item md={12} lg={6}>
+            <Grid container>
               <Grid item xs={12}>
-                <Typography variant="body1">
-                  Previous word was {previousWord}
-                </Typography>
+                <Paper elevation={3} className="canvasContainer">
+                  {renderPlayersIcon()}
+                  {renderGameState()}
+                </Paper>
               </Grid>
-            ) : null}
+              <Grid item xs={12}>
+                <div className="inputContainer">
+                  {showGuessBox ? (
+                    <TextField
+                      className="guessBox"
+                      id="txt-guess"
+                      size="small"
+                      ref={guessBoxRef}
+                      disabled={disableGuessBox || isOnscreenKeyboardVisible}
+                      label="Guess!"
+                      value={guess}
+                      variant="outlined"
+                      onKeyDown={(e) => guessBoxPressed(e)}
+                      onChange={(e) => {
+                        setGuess(e.target.value);
+                        if (keyboardRef.current) {
+                          keyboardRef.current.setInput(e.target.value);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <Typography variant="h5">{drawWord}</Typography>
+                  )}
+                </div>
+              </Grid>
+              {renderKeyboard()}
+              {previousWord ? (
+                <Grid item xs={12}>
+                  <Typography variant="body1">
+                  Previous word was {previousWord}
+                  </Typography>
+                </Grid>
+              ) : null}
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={3}>
-          {renderCanvasToolbox()}
-        </Grid>
-        {!playerNickname && (
-          <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-        )}
+          <Grid item xs={12} sm={12} md={12} lg={3}>
+            {renderCanvasToolbox()}
+          </Grid>
+          {!playerNickname && (
+            <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
+          )}
 
-        {shouldShowPlayersList && (
-          <UserScoreListDialog
-            userScores={userScores}
-            handleDone={() => {
-              setShouldShowPlayersList(false);
-            }}
-          />
-        )}
-      </Grid>
-    </div>
+          {shouldShowPlayersList && (
+            <UserScoreListDialog
+              userScores={userScores}
+              handleDone={() => {
+                setShouldShowPlayersList(false);
+              }}
+            />
+          )}
+        </Grid>
+      </div>
+    </StylesProvider>
   );
 }
 
