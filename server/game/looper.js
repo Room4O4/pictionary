@@ -3,7 +3,7 @@ const picWordGenerator = require('pic-word-gen');
 
 class Looper {
   constructor (room, roomEventBridge) {
-    this.ROUND_DURATION = 30000;
+    this.ROUND_DURATION = 60000;
     this.GAME_STATE_IDLE = 0;
     this.GAME_STATE_ROUND_IN_PROGRESS = 1;
     this.GAME_STATE_WAIT_FOR_NEXT_ROUND = 2;

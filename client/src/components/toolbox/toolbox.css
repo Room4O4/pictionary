@@ -1,17 +1,13 @@
 .colorPicker {
-  margin: auto;
+  margin: auto !important;
+  position: relative !important;
+  width: 100% !important;
+}
+
+.colorPickerContainer {
+  padding: 5px;
 }
 
 .toolboxContainer {
   padding-top: 10px;
-  margin-right: 10%;
 }
-
-@media only screen and (max-width: 600px) {
-  .toolboxContainer {
-    padding-top: 10px;
-    width: 90vw;
-    margin: auto;
-  }
-}
-

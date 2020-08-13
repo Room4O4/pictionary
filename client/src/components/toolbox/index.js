@@ -11,7 +11,7 @@ const CanvasToolbox = ({ onColorChanged, onClearCanvasPressed }) => {
         <Grid item xs={12}>
           <UIButton variant="contained" onClick={onClearCanvasPressed}>Clear canvas </UIButton>
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} className="colorPickerContainer">
           <CirclePicker className="colorPicker" width="275px" triangle="hide" onChangeComplete={(color, event) => {
             onColorChanged(color.hex);
           }} colors={

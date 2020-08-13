@@ -45,33 +45,40 @@ body {
   max-height: 100vh;
 }
 
+.userScoreContainer {
+  margin: auto;
+}
+
+.logWindowContainer {
+  margin: auto;
+}
+
+.midPane {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.midPaneContainer {
+  margin: auto;
+}
+
 .guessBox {
   width: 100%;
   background-color: white;
+  z-index: 100;
 }
 
 .canvasContainer {
-  position: relative;
-  width: 75vh;
-  height: 75vh;
   margin: auto;
 }
 
 .inputContainer {
   position: relative;
-  width: 75vh;
   margin: auto;
 }
 
-@media only screen and (max-width: 600px) {
-  .canvasContainer {
-    width: 90vw;
-    height: 90vw;
-  }
-
-  .inputContainer {
-    width: 90vw;
-  }
+.canvasToolboxContainer {
+  margin: auto;
 }
 
 .playersIconContainer {
@@ -93,6 +100,6 @@ body {
 }
 
 .keyboardContainer {
-  padding: 5px 10px 5px 10px;
+  margin: auto;
 }
 
