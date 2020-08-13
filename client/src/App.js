@@ -5,6 +5,7 @@ import { StylesProvider } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from '@material-ui/core/Grid';
 import Keyboard from 'react-simple-keyboard';
+import ElementResizeDetectorMaker from 'element-resize-detector';
 import Typography from '@material-ui/core/Typography';
 import { ReactComponent as AppLogo } from './assets/logo.svg';
 
@@ -50,6 +51,7 @@ function App () {
 
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
+  const canvasPaperRef = useRef(null);
 
   const isOnscreenKeyboardVisible = useMediaQuery('(max-width:600px)');
 
@@ -186,6 +188,15 @@ function App () {
     });
   }, []);
 
+  const erd = ElementResizeDetectorMaker();
+
+  useEffect(() => {
+    erd.listenTo(document.getElementById('canvasContainer'), (element) => {
+      console.log('Resize', element.offsetWidth, element.offsetHeight);
+      canvasPaperRef.current.style.height = `${element.offsetWidth}px`;
+    });
+  }, []);
+
   const guessBoxPressed = (e) => {
     if (e.keyCode === 13) {
       // Enter pressed. send it to server
@@ -295,7 +306,7 @@ function App () {
   const renderKeyboard = () => {
     return (
       <Hidden smUp>
-        <Grid item xs={12} className="keyboardContainer">
+        <Grid item xs={11} className="keyboardContainer">
           {showGuessBox ? (
             <Keyboard
               keyboardRef={(r) => (keyboardRef.current = r)}
@@ -316,82 +327,112 @@ function App () {
   const renderCanvasToolbox = () => {
     console.log(`showGuessBox ${showGuessBox}, gamestate ${gameState}`);
     if (gameState === GameStateConstants.GAME_STATE_NEW_ROUND && !showGuessBox) {
-      return <CanvasToolbox onColorChanged={handleColorChange} onClearCanvasPressed={handleClearCanvas} />;
+      return (
+        <Grid container>
+          <Grid item xs={11} className="canvasToolboxContainer">
+            <CanvasToolbox onColorChanged={handleColorChange} onClearCanvasPressed={handleClearCanvas} />
+          </Grid>
+        </Grid>
+      );
+      // return <CanvasToolbox onColorChanged={handleColorChange} onClearCanvasPressed={handleClearCanvas} />;
     } else {
       return null;
     }
   };
 
+  const renderAppBar = () => {
+    return (
+      <AppBar position="static" color="primary">
+        <Toolbar>
+          <IconButton edge="start" color="inherit" aria-label="menu">
+            <SvgIcon fontSize="large" component={AppLogo} viewBox="0 0 48 48" width="48" height="48"/>
+          </IconButton>
+          <Typography variant="h6">
+              Pictionary
+          </Typography>
+        </Toolbar>
+      </AppBar>
+    );
+  };
+
+  const renderLeftPane = () => {
+    return (
+      <Hidden mdDown>
+        <Grid item lg={3}>
+          <Grid container>
+            <Grid item xs={10} className="userScoreContainer">
+              <UserScoreList userScores={userScores} />
+            </Grid>
+            <Grid item xs={10} className="logWindowContainer">
+              <LogWindow className="logWindow" messages={messageLog}></LogWindow>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Hidden>
+    );
+  };
+
+  const renderMidPane = () => {
+    return (
+      <Grid item md={8} lg={6} className="midPane">
+        <Grid container>
+          <Grid item xs={11} md={9} lg={9} className="midPaneContainer">
+            <Paper ref={canvasPaperRef} elevation={3} id="canvasContainer" className="canvasContainer">
+              {renderPlayersIcon()}
+              {renderGameState()}
+            </Paper>
+          </Grid>
+          <Grid item xs={11} md={9} lg={9} className="inputContainer">
+            <div>
+              {showGuessBox ? (
+                <TextField
+                  className="guessBox"
+                  id="txt-guess"
+                  size="small"
+                  ref={guessBoxRef}
+                  disabled={disableGuessBox || isOnscreenKeyboardVisible}
+                  label="Guess!"
+                  value={guess}
+                  variant="outlined"
+                  onKeyDown={(e) => guessBoxPressed(e)}
+                  onChange={(e) => {
+                    setGuess(e.target.value);
+                    if (keyboardRef.current) {
+                      keyboardRef.current.setInput(e.target.value);
+                    }
+                  }}
+                />
+              ) : (
+                <Typography variant="h5">{drawWord}</Typography>
+              )}
+            </div>
+          </Grid>
+          {renderKeyboard()}
+          {previousWord ? (
+            <Grid item xs={12}>
+              <Typography variant="body1">
+                  Previous word was {previousWord}
+              </Typography>
+            </Grid>
+          ) : null}
+        </Grid>
+      </Grid>
+    );
+  };
+
   return (
     <StylesProvider injectFirst>
       <div className="App">
-        <AppBar position="static" color="primary">
-          <Toolbar>
-            <IconButton edge="start" color="inherit" aria-label="menu">
-              <SvgIcon fontSize="large" component={AppLogo} viewBox="0 0 48 48" width="48" height="48"/>
-            </IconButton>
-            <Typography variant="h6">
-              Pictionary
-            </Typography>
-          </Toolbar>
-        </AppBar>
+        {renderAppBar()}
         <Grid container className="layoutContainer">
-          <Hidden mdDown>
-            <Grid item md={3} lg={3}>
-              <UserScoreList userScores={userScores} />
-              <LogWindow className="logWindow" messages={messageLog}></LogWindow>
-            </Grid>
-          </Hidden>
-          <Grid item md={12} lg={6}>
-            <Grid container>
-              <Grid item xs={12}>
-                <Paper elevation={3} className="canvasContainer">
-                  {renderPlayersIcon()}
-                  {renderGameState()}
-                </Paper>
-              </Grid>
-              <Grid item xs={12}>
-                <div className="inputContainer">
-                  {showGuessBox ? (
-                    <TextField
-                      className="guessBox"
-                      id="txt-guess"
-                      size="small"
-                      ref={guessBoxRef}
-                      disabled={disableGuessBox || isOnscreenKeyboardVisible}
-                      label="Guess!"
-                      value={guess}
-                      variant="outlined"
-                      onKeyDown={(e) => guessBoxPressed(e)}
-                      onChange={(e) => {
-                        setGuess(e.target.value);
-                        if (keyboardRef.current) {
-                          keyboardRef.current.setInput(e.target.value);
-                        }
-                      }}
-                    />
-                  ) : (
-                    <Typography variant="h5">{drawWord}</Typography>
-                  )}
-                </div>
-              </Grid>
-              {renderKeyboard()}
-              {previousWord ? (
-                <Grid item xs={12}>
-                  <Typography variant="body1">
-                  Previous word was {previousWord}
-                  </Typography>
-                </Grid>
-              ) : null}
-            </Grid>
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={3}>
+          {renderLeftPane()}
+          {renderMidPane()}
+          <Grid item xs={12} md={4} lg={3}>
             {renderCanvasToolbox()}
           </Grid>
           {!playerNickname && (
             <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
           )}
-
           {shouldShowPlayersList && (
             <UserScoreListDialog
               userScores={userScores}
