@@ -7,12 +7,12 @@ import UIButton from '../button';
 const CanvasToolbox = ({ onColorChanged, onClearCanvasPressed }) => {
   return (
     <Paper elevation={3} className="toolboxContainer">
-      <Grid container direction="column" spacing={2} xs={12}>
+      <Grid container xs={12}>
         <Grid item xs={12}>
           <UIButton variant="contained" onClick={onClearCanvasPressed}>Clear canvas </UIButton>
         </Grid>
         <Grid item xs={12} className="colorPickerContainer">
-          <CirclePicker className="colorPicker" width="275px" triangle="hide" onChangeComplete={(color, event) => {
+          <CirclePicker className="colorPicker" circleSpacing={10} width={228} onChangeComplete={(color, event) => {
             onColorChanged(color.hex);
           }} colors={
             [

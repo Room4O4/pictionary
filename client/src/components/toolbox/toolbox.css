@@ -1,11 +1,11 @@
 .colorPicker {
-  margin: auto !important;
-  position: relative !important;
-  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 .colorPickerContainer {
-  padding: 5px;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .toolboxContainer {
