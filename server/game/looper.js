@@ -8,7 +8,7 @@ class Looper {
     this.GAME_STATE_ROUND_IN_PROGRESS = 1;
     this.GAME_STATE_WAIT_FOR_NEXT_ROUND = 2;
     this.GAME_STATE_ANNOUNCE_WINNER = 3;
-
+    this._currentRoundStartTime = 0;
     this._roundStarted = false;
     this._roundsLeft = 0;
     this._totalRounds = 0;
@@ -37,6 +37,34 @@ class Looper {
     }
     this._roomEventBridge.updateUserSocket(dbUser.id, socketId);
     this._roomEventBridge.broadcastScores(this._users);
+    switch (this._gameState) {
+      case this.GAME_STATE_IDLE:
+        this._roomEventBridge.sendRoomStateToPlayer(dbUser.id, 'GE_IDLE');
+        break;
+      case this.GAME_STATE_WAIT_FOR_NEXT_ROUND:
+        this._roomEventBridge.sendRoomStateToPlayer(dbUser.id, 'GE_WAIT_FOR_NEXT_ROUND', {
+          previousWord: this._currentWord,
+          round: this._roundsLeft,
+          total: this._totalRounds
+        });
+        break;
+      case this.GAME_STATE_ROUND_IN_PROGRESS: {
+        const currentDrawingUser = this._users[this._currentUserDrawIndex];
+        this._roomEventBridge.sendRoomStateToPlayer(dbUser.id, 'GE_NEW_ROUND', {
+          round: this._roundsLeft,
+          total: this._totalRounds,
+          currentDrawingUser,
+          startTimestamp: this._currentRoundStartTime
+        });
+        break;
+      }
+      case this.GAME_STATE_ANNOUNCE_WINNER:
+        this._roomEventBridge.broadcastRoomState(dbUser.id, 'GE_ANNOUNCE_WINNER');
+        break;
+      default:
+        this._roomEventBridge.broadcastRoomState('GE_IDLE');
+        break;
+    }
     debug('Added new user - ', dbUser);
   }
 
@@ -87,7 +115,11 @@ class Looper {
       this._gameState = this.GAME_STATE_WAIT_FOR_NEXT_ROUND;
       this._roomEventBridge.broadcastRoomState(
         'GE_WAIT_FOR_NEXT_ROUND',
-        this._currentWord
+        {
+          previousWord: this._currentWord,
+          round: this._roundsLeft,
+          total: this._totalRounds
+        }
       );
       const that = this;
       setTimeout(() => {
@@ -105,7 +137,10 @@ class Looper {
 
   startRound () {
     debug('start new round');
+    this._gameState = this.GAME_STATE_ROUND_IN_PROGRESS;
     this._roundStarted = true;
+    this._currentRoundStartTime = +new Date(); // record the timestamp during at which the round started.
+
     // Assign a user to draw
     this._currentUserDrawIndex =
       (this._totalRounds - this._roundsLeft) % this._users.length;
@@ -124,7 +159,8 @@ class Looper {
     this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', {
       round: this._roundsLeft,
       total: this._totalRounds,
-      currentDrawingUser
+      currentDrawingUser,
+      startTimestamp: this._currentRoundStartTime
     });
     this._roomEventBridge.sendWordToPlayer(
       currentDrawingUser.id,
