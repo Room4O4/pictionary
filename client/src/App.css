@@ -12,7 +12,11 @@ html {
 
 body {
   background-color: var(--backgroundColor);
+
+  /* Disables pull-to-refresh but allows overscroll glow effects. */
+  overscroll-behavior-y: contain;
 }
+
 
 .App-logo {
   height: 40vmin;
