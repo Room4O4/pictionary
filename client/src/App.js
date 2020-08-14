@@ -24,6 +24,7 @@ import 'react-simple-keyboard/build/css/index.css';
 import CanvasToolbox from './components/toolbox';
 
 const DEFAULT_ROOM = 'main';
+const ROUND_DURATION = 60000;
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);
@@ -89,7 +90,9 @@ function App () {
           ]);
         });
 
-        io.on('GE_NEW_ROUND', ({ round, total }) => {
+        io.on('GE_NEW_ROUND', ({ round, total, currentDrawingUser, startTimestamp }) => {
+          const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
+          setRoundDuration(secondsLeft);
           setDrawWord(null);
           setGuess('');
           setShowGuessBox(true);
@@ -100,14 +103,16 @@ function App () {
           console.log(`New Round starting, Round: ${round}, Total: ${total}`);
           setMessageLog((messageLog) => [
             ...messageLog,
-            `msgSystem!!!New Round starting, Round: ${round}, Total: ${total}`
+            `msgSystem!!!New Round starting, Round: ${round}, Total: ${total}`,
+            `${currentDrawingUser.id} is drawing. Start guessing!`
           ]);
         });
 
-        io.on('GE_WAIT_FOR_NEXT_ROUND', (previousWord) => {
+        io.on('GE_WAIT_FOR_NEXT_ROUND', ({ previousWord, round, total }) => {
           setShowGuessBox(false);
           setDrawWord(null);
           setPreviousWord(previousWord);
+          setRoundInfo({ current: total - round + 1, total });
           setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
           setMessageLog((messageLog) => [
             ...messageLog,

@@ -77,6 +77,37 @@ class RoomEventBridge extends EventEmitter {
     if (clientSocket) clientSocket.emit('GE_NEW_WORD', word);
   }
 
+  sendRoomStateToPlayer (userId, eventName, args) {
+    const clientSocket = this._getClientSocketInRoom(
+      this._userSocketIdMap[userId]
+    );
+    if (clientSocket) {
+      debug('Send room state to player event: ', eventName);
+
+      switch (eventName) {
+        case 'GE_NEW_GAME':
+          clientSocket.emit('GE_NEW_GAME', args);
+          break;
+        case 'GE_NEW_ROUND':
+          clientSocket.emit('GE_NEW_ROUND', args);
+          break;
+        case 'GE_ANNOUNCE_WINNER':
+          clientSocket.emit('GE_ANNOUNCE_WINNER');
+          break;
+        case 'GE_IDLE':
+          clientSocket.emit('GE_IDLE');
+          break;
+        case 'GE_WAIT_FOR_NEXT_ROUND':
+          clientSocket.emit('GE_WAIT_FOR_NEXT_ROUND', args);
+          break;
+        default:
+          break;
+      }
+    } else {
+      debug('Couldnt find client socket for user.id ', userId);
+    }
+  }
+
   broadcastRoomState (eventName, args) {
     debug('Broadcast event: ', eventName);
     switch (eventName) {
