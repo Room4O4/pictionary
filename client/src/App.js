@@ -24,7 +24,7 @@ import 'react-simple-keyboard/build/css/index.css';
 import CanvasToolbox from './components/toolbox';
 
 const DEFAULT_ROOM = 'main';
-const ROUND_DURATION = 60000;
+const ROUND_DURATION = 60;
 
 function App () {
   const [socketIO, setSocketIO] = useState(null);

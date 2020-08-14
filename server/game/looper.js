@@ -212,8 +212,31 @@ class Looper {
             this.ROUND_DURATION
           );
           this._roomEventBridge.broadcastScores(this._users);
-          this._roundsLeft = this._users.length;
-          this._totalRounds = this._users.length;
+          switch (this._users.length) {
+            case 2:
+              this._totalRounds = 10;
+              break;
+            case 3:
+              this._totalRounds = 9;
+              break;
+            case 4:
+              this._totalRounds = 8;
+              break;
+            case 5:
+              this._totalRounds = 10;
+              break;
+            case 6:
+              this._totalRounds = 12;
+              break;
+            case 7:
+              this._totalRounds = 14;
+              break;
+            default:
+              this._totalRounds = this._users.length;
+              break;
+          }
+          this._roundsLeft = this._totalRounds;
+
           this.startRound();
         }
         break;
