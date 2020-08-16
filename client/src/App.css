@@ -49,12 +49,18 @@ body {
   max-height: 100vh;
 }
 
-.userScoreContainer {
-  margin: auto;
+.userScoreGridItem {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  margin-top: auto;
+  height: 42vh;
 }
 
 .logWindowContainer {
-  margin: auto;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 20px;
 }
 
 .midPane {

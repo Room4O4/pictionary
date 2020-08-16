@@ -1,8 +1,9 @@
 
 .userScoreList {
   overflow: auto;
-  height: 42vh;
+  max-height: 100%;
   margin-bottom: 30px;
+  margin-top: 10px;
 }
 
 .userScoreListItem {

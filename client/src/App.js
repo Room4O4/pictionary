@@ -300,9 +300,9 @@ function App () {
           />
         );
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
-        return <GameStateDisplay gameState={{ state: gameState, roundInfo }} />;
+        return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }} />;
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
-        return <GameStateDisplay gameState={{ state: gameState }} />;
+        return <GameStateDisplay gameState={{ state: gameState, userScores }} />;
       default:
         break;
     }
@@ -365,8 +365,10 @@ function App () {
       <Hidden mdDown>
         <Grid item lg={3}>
           <Grid container>
-            <Grid item xs={10} className="userScoreContainer">
-              <UserScoreList userScores={userScores} />
+            <Grid item xs={10} className="userScoreGridItem">
+              <Paper elevation={3} className="userScoreContainer" >
+                <UserScoreList userScores={userScores} />
+              </Paper>
             </Grid>
             <Grid item xs={10} className="logWindowContainer">
               <LogWindow className="logWindow" messages={messageLog}></LogWindow>
@@ -375,6 +377,42 @@ function App () {
         </Grid>
       </Hidden>
     );
+  };
+
+  const renderBottomPane = () => {
+    if (gameState === GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND ||
+      gameState === GameStateConstants.GAME_STATE_IDLE ||
+      gameState === GameStateConstants.GAME_STATE_ANNOUNCE_WINNER) {
+      return <Hidden mdUp>
+        <Paper elevation={3} >
+          <UserScoreList userScores={userScores} />
+        </Paper>
+      </Hidden>;
+    } else {
+      return <div>
+        {showGuessBox ? (
+          <TextField
+            className="guessBox"
+            id="txt-guess"
+            size="small"
+            ref={guessBoxRef}
+            disabled={disableGuessBox || isOnscreenKeyboardVisible}
+            label="Guess!"
+            value={guess}
+            variant="outlined"
+            onKeyDown={(e) => guessBoxPressed(e)}
+            onChange={(e) => {
+              setGuess(e.target.value);
+              if (keyboardRef.current) {
+                keyboardRef.current.setInput(e.target.value);
+              }
+            }}
+          />
+        ) : (
+          <Typography variant="h5">{drawWord}</Typography>
+        )}
+      </div>;
+    }
   };
 
   const renderMidPane = () => {
@@ -387,39 +425,17 @@ function App () {
               {renderGameState()}
             </Paper>
           </Grid>
-          <Grid item xs={11} md={9} lg={9} className="inputContainer">
-            <div>
-              {showGuessBox ? (
-                <TextField
-                  className="guessBox"
-                  id="txt-guess"
-                  size="small"
-                  ref={guessBoxRef}
-                  disabled={disableGuessBox || isOnscreenKeyboardVisible}
-                  label="Guess!"
-                  value={guess}
-                  variant="outlined"
-                  onKeyDown={(e) => guessBoxPressed(e)}
-                  onChange={(e) => {
-                    setGuess(e.target.value);
-                    if (keyboardRef.current) {
-                      keyboardRef.current.setInput(e.target.value);
-                    }
-                  }}
-                />
-              ) : (
-                <Typography variant="h5">{drawWord}</Typography>
-              )}
-            </div>
-          </Grid>
-          {renderKeyboard()}
           {previousWord ? (
             <Grid item xs={12}>
-              <Typography variant="body1">
+              <Typography variant="body1" style={{ marginTop: '10px' }}>
                   Previous word was {previousWord}
               </Typography>
             </Grid>
           ) : null}
+          <Grid item xs={11} md={9} lg={9} className="inputContainer">
+            {renderBottomPane()}
+          </Grid>
+          {renderKeyboard()}
         </Grid>
       </Grid>
     );
