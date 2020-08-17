@@ -384,7 +384,7 @@ function App () {
       gameState === GameStateConstants.GAME_STATE_IDLE ||
       gameState === GameStateConstants.GAME_STATE_ANNOUNCE_WINNER) {
       return <Hidden mdUp>
-        <Paper elevation={3} >
+        <Paper elevation={3} style={{ marginBottom: '10px', marginTop: '10px' }} >
           <UserScoreList userScores={userScores} />
         </Paper>
       </Hidden>;

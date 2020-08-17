@@ -55,6 +55,12 @@ body {
   margin-bottom: 10px;
   margin-top: auto;
   height: 42vh;
+  display: flex;
+}
+
+.userScoreContainer {
+  width: 100%;
+  display: flex;
 }
 
 .logWindowContainer {
