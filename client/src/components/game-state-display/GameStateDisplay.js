@@ -21,6 +21,8 @@ const GameStateDisplay = ({ gameState, canvasOptions }) => {
       } else {
         return `And the winner is ${winners[0].name}!`;
       }
+    } else {
+      return 'Game Over, Wait For New Game!';
     }
   };
 

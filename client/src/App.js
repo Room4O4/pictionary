@@ -155,6 +155,11 @@ function App () {
                 `msgSystemWinner!!!Game Over, And the Winner is ${winners[0].name}`
               ]);
             }
+          } else {
+            setMessageLog((messageLog) => [
+              ...messageLog,
+              'msgSystemWinner!!!Game Over, Wait for new game!'
+            ]);
           }
         });
 

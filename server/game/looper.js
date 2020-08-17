@@ -199,7 +199,11 @@ class Looper {
       }
     });
     debug('Winner Announcement - ', winners);
-    return winners;
+    if (highScore > 0) {
+      return winners;
+    } else {
+      return null;
+    }
   }
 
   announceWinner () {
