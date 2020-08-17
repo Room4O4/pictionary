@@ -44,9 +44,7 @@ function App () {
   const [gameState, setGameState] = useState(
     GameStateConstants.GAME_STATE_IDLE
   );
-  const [canvasOptions, setCanvasOptions] = useState({
-    color: '#000000'
-  });
+  const [canvasOptions, setCanvasOptions] = useState({ color: '#000000' });
   const [messageLog, setMessageLog] = useState([]);
   const [lastGuess, setLastGuess] = useState('');
   const [winners, setWinners] = useState([]);
@@ -290,7 +288,8 @@ function App () {
 
   const handleColorChange = (color) => {
     setCanvasOptions({
-      color: color
+      color: color,
+      enabled: canvasOptions.enabled
     });
   };
 
@@ -327,9 +326,10 @@ function App () {
               lastGuess,
               roundDuration
             }}
-            canvasOptions={canvasOptions}
+            canvasOptions={{ color: canvasOptions.color, enabled: !!drawWord }}
           />
         );
+
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
         return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }} />;
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:

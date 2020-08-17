@@ -84,13 +84,17 @@ class Looper {
       const foundUser = this._users.find((user) => userId === user.id);
       if (foundUser) {
         foundUser.score += 10;
-        this._roomEventBridge.broadcastScores(this._users);
-        // TODO: fetch username and passit across. Why should frontend deal with UserId of other users
-        this._roomEventBridge.broadcastLastGuess(
-          userId.split('_')[0],
-          guess,
-          true
-        );
+        const currentDrawingUser = this._users[this._currentUserDrawIndex];
+        if (currentDrawingUser) {
+          currentDrawingUser.score += 3;
+          this._roomEventBridge.broadcastScores(this._users);
+          // TODO: fetch username and passit across. Why should frontend deal with UserId of other users
+          this._roomEventBridge.broadcastLastGuess(
+            userId.split('_')[0],
+            guess,
+            true
+          );
+        }
       }
     } else {
       // TODO: fetch username and passit across. Why should frontend deal with UserId of other users

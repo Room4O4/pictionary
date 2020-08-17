@@ -108,18 +108,22 @@ const Canvas = ({ io, canvasOptions }) => {
     });
   }
   function onMouseDown (e) {
+    if (canvasOptions.enabled) {
     // e = Mouse click event.
-    var rect = e.target.getBoundingClientRect();
-    const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
-    const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
-    const inputX = e.clientX || e.touches[0].clientX;
-    const inputY = e.clientY || e.touches[0].clientY;
+      var rect = e.target.getBoundingClientRect();
+      const scaleX = canvasRef.current.width / rect.width; // relationship bitmap vs. element for X
+      const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
+      const inputX = e.clientX || e.touches[0].clientX;
+      const inputY = e.clientY || e.touches[0].clientY;
 
-    var x = (inputX - rect.left) * scaleX; // x position within the element.
-    var y = (inputY - rect.top) * scaleY; // y position within the element.
-    drawing = true;
-    current.x = x;
-    current.y = y;
+      var x = (inputX - rect.left) * scaleX; // x position within the element.
+      var y = (inputY - rect.top) * scaleY; // y position within the element.
+      drawing = true;
+      current.x = x;
+      current.y = y;
+    } else {
+      drawing = false;
+    }
   }
 
   function onMouseUp (e) {
