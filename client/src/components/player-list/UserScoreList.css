@@ -12,3 +12,6 @@
   min-width: 200px;
 }
 
+.userScoreListItemPoints {
+  flex-grow: 0;
+}

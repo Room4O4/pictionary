@@ -30,8 +30,8 @@ const buildUserList = (userScores) => {
             {userScore.name}
           </Typography>
         </ListItemText>
-        <ListItemText>
-          <Typography variant="body1" className="userScoreListItemPoints">
+        <ListItemText className="userScoreListItemPoints">
+          <Typography variant="body1" >
             {userScore.score}
           </Typography>
         </ListItemText>
