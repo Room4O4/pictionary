@@ -49,6 +49,7 @@ function App () {
   });
   const [messageLog, setMessageLog] = useState([]);
   const [lastGuess, setLastGuess] = useState('');
+  const [winners, setWinners] = useState([]);
 
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
@@ -84,6 +85,7 @@ function App () {
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
           setLastGuess('');
+          setWinners([]);
           setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
           setMessageLog((messageLog) => [
             ...messageLog,
@@ -123,18 +125,37 @@ function App () {
           ]);
         });
 
-        io.on('GE_ANNOUNCE_WINNER', () => {
+        io.on('GE_ANNOUNCE_WINNER', (winners) => {
           setShowGuessBox(false);
           setDrawWord(null);
           setLastGuess('');
+          setWinners(winners);
           console.log('Announce Winner');
           setShowGuessBox(false);
           setDrawWord(null);
           setGameState(GameStateConstants.GAME_STATE_ANNOUNCE_WINNER);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            'msgSystemWinner!!!Game Over, And the Winner is...'
-          ]);
+          if (winners) {
+            if (winners.length > 1) {
+              let winnersString = '';
+              winnersString = winners.reduce((accumulator, winner) => {
+                if (accumulator) {
+                  return `${accumulator}, ${winner.name}`;
+                } else {
+                  return winner.name;
+                }
+              }, '');
+              console.log(winnersString);
+              setMessageLog((messageLog) => [
+                ...messageLog,
+                `msgSystemWinner!!!Game Over, And the Winners are ${winnersString}`
+              ]);
+            } else {
+              setMessageLog((messageLog) => [
+                ...messageLog,
+                `msgSystemWinner!!!Game Over, And the Winner is ${winners[0].name}`
+              ]);
+            }
+          }
         });
 
         io.on('GE_NEW_WORD', (word) => {
@@ -307,7 +328,7 @@ function App () {
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
         return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }} />;
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
-        return <GameStateDisplay gameState={{ state: gameState, userScores }} />;
+        return <GameStateDisplay gameState={{ state: gameState, winners }} />;
       default:
         break;
     }

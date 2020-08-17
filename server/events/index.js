@@ -92,7 +92,7 @@ class RoomEventBridge extends EventEmitter {
           clientSocket.emit('GE_NEW_ROUND', args);
           break;
         case 'GE_ANNOUNCE_WINNER':
-          clientSocket.emit('GE_ANNOUNCE_WINNER');
+          clientSocket.emit('GE_ANNOUNCE_WINNER', args);
           break;
         case 'GE_IDLE':
           clientSocket.emit('GE_IDLE');
@@ -118,7 +118,7 @@ class RoomEventBridge extends EventEmitter {
         this._io.emit('GE_NEW_ROUND', args);
         break;
       case 'GE_ANNOUNCE_WINNER':
-        this._io.emit('GE_ANNOUNCE_WINNER');
+        this._io.emit('GE_ANNOUNCE_WINNER', args);
         break;
       case 'GE_IDLE':
         this._io.emit('GE_IDLE');

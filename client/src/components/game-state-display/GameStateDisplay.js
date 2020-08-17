@@ -5,6 +5,25 @@ import GameArea from './game-area/GameArea';
 import './game-state-display.css';
 
 const GameStateDisplay = ({ gameState, canvasOptions }) => {
+  const renderWinnerString = (winners) => {
+    if (winners && winners.length > 1) {
+      if (winners.length > 1) {
+        let winnersString = '';
+        winnersString = winners.reduce((accumulator, winner) => {
+          if (accumulator) {
+            return `${accumulator}, ${winner.name}`;
+          } else {
+            return winner.name;
+          }
+        }, '');
+        console.log(winnersString);
+        return `And the winners are ${winnersString}!`;
+      } else {
+        return `And the winner is ${winners[0].name}!`;
+      }
+    }
+  };
+
   const renderGameState = () => {
     switch (gameState.state) {
       case GameStateConstants.GAME_STATE_IDLE:
@@ -30,11 +49,13 @@ const GameStateDisplay = ({ gameState, canvasOptions }) => {
           </Typography>
         );
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
+      {
         return (
           <Typography className="message-banner" variant="h4">
-            And the Winner is ___
+            {renderWinnerString(gameState.winners)}
           </Typography>
         );
+      }
 
       default:
         break;

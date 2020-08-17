@@ -59,7 +59,7 @@ class Looper {
         break;
       }
       case this.GAME_STATE_ANNOUNCE_WINNER:
-        this._roomEventBridge.broadcastRoomState(dbUser.id, 'GE_ANNOUNCE_WINNER');
+        this._roomEventBridge.broadcastRoomState(dbUser.id, 'GE_ANNOUNCE_WINNER', this.winners());
         break;
       default:
         this._roomEventBridge.broadcastRoomState('GE_IDLE');
@@ -185,9 +185,26 @@ class Looper {
     debug('Game over, Announce winner');
   }
 
+  winners () {
+    let winners = [];
+    let highScore = 0;
+
+    this._users.forEach(user => {
+      if (user.score >= highScore) {
+        if (user.score > highScore) {
+          highScore = user.score;
+          winners = [];
+        }
+        winners.push(user);
+      }
+    });
+    debug('Winner Announcement - ', winners);
+    return winners;
+  }
+
   announceWinner () {
     debug('Winner announced!');
-    this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER');
+    this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER', this.winners());
     this._roundsLeft = 0;
     this._totalRounds = 0;
     this._currentWord = null;
@@ -214,7 +231,7 @@ class Looper {
           this._roomEventBridge.broadcastScores(this._users);
           switch (this._users.length) {
             case 2:
-              this._totalRounds = 10;
+              this._totalRounds = 8;
               break;
             case 3:
               this._totalRounds = 9;
