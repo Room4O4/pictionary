@@ -83,6 +83,7 @@ function App () {
           console.log('New Game starting...');
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
+          setLastGuess('');
           setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
           setMessageLog((messageLog) => [
             ...messageLog,
@@ -94,6 +95,7 @@ function App () {
           const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
           setRoundDuration(secondsLeft);
           setDrawWord(null);
+          setLastGuess('');
           setGuess('');
           setShowGuessBox(true);
           setDisableGuessBox(false);
@@ -111,6 +113,7 @@ function App () {
         io.on('GE_WAIT_FOR_NEXT_ROUND', ({ previousWord, round, total }) => {
           setShowGuessBox(false);
           setDrawWord(null);
+          setLastGuess('');
           setPreviousWord(previousWord);
           setRoundInfo({ current: total - round + 1, total });
           setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
@@ -123,6 +126,7 @@ function App () {
         io.on('GE_ANNOUNCE_WINNER', () => {
           setShowGuessBox(false);
           setDrawWord(null);
+          setLastGuess('');
           console.log('Announce Winner');
           setShowGuessBox(false);
           setDrawWord(null);
@@ -134,6 +138,7 @@ function App () {
         });
 
         io.on('GE_NEW_WORD', (word) => {
+          setLastGuess('');
           setDrawWord(word);
           setShowGuessBox(false);
           setMessageLog((messageLog) => [
