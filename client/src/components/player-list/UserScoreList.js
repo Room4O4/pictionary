@@ -41,10 +41,22 @@ const buildUserList = (userScores) => {
   return renderUsers;
 };
 
+const sortArray = (array, key) => {
+  if (array) {
+    return array.sort(function (a, b) {
+      var x = a[key]; var y = b[key];
+      return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+    });
+  } else {
+    return null;
+  }
+};
+
 const UserScoreList = ({ userScores }) => {
   console.log(userScores);
+  const sortedScores = sortArray(userScores, 'score');
   return (
-    <List className="userScoreList" component="nav">{buildUserList(userScores)}</List>
+    <List className="userScoreList" component="nav">{buildUserList(sortedScores)}</List>
   );
 };
 
