@@ -6,7 +6,7 @@ import './game-state-display.css';
 
 const GameStateDisplay = ({ gameState, canvasOptions }) => {
   const renderWinnerString = (winners) => {
-    if (winners && winners.length > 1) {
+    if (winners && winners.length > 0) {
       if (winners.length > 1) {
         let winnersString = '';
         winnersString = winners.reduce((accumulator, winner) => {
