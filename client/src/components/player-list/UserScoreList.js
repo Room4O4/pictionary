@@ -4,7 +4,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from 'react-avatar';
-import { Typography, Paper } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 
 import './UserScoreList.css';
 
@@ -30,8 +30,8 @@ const buildUserList = (userScores) => {
             {userScore.name}
           </Typography>
         </ListItemText>
-        <ListItemText>
-          <Typography variant="body1" className="userScoreListItemPoints">
+        <ListItemText className="userScoreListItemPoints">
+          <Typography variant="body1" >
             {userScore.score}
           </Typography>
         </ListItemText>
@@ -41,12 +41,22 @@ const buildUserList = (userScores) => {
   return renderUsers;
 };
 
+const sortArray = (array, key) => {
+  if (array) {
+    return array.sort(function (a, b) {
+      var x = a[key]; var y = b[key];
+      return ((x > y) ? -1 : ((x < y) ? 1 : 0));
+    });
+  } else {
+    return null;
+  }
+};
+
 const UserScoreList = ({ userScores }) => {
   console.log(userScores);
+  const sortedScores = sortArray(userScores, 'score');
   return (
-    <Paper className="userScoreList" elevation={3}>
-      <List component="nav">{buildUserList(userScores)}</List>
-    </Paper>
+    <List className="userScoreList" component="nav">{buildUserList(sortedScores)}</List>
   );
 };
 

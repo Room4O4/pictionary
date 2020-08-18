@@ -1,8 +1,8 @@
 
 .userScoreList {
   overflow: auto;
-  height: 42vh;
-  margin-bottom: 30px;
+  max-height: 100%;
+  width: 100%;
 }
 
 .userScoreListItem {
@@ -12,3 +12,6 @@
   min-width: 200px;
 }
 
+.userScoreListItemPoints {
+  flex-grow: 0;
+}

@@ -44,11 +44,10 @@ function App () {
   const [gameState, setGameState] = useState(
     GameStateConstants.GAME_STATE_IDLE
   );
-  const [canvasOptions, setCanvasOptions] = useState({
-    color: '#000000'
-  });
+  const [canvasOptions, setCanvasOptions] = useState({ color: '#000000' });
   const [messageLog, setMessageLog] = useState([]);
   const [lastGuess, setLastGuess] = useState('');
+  const [winners, setWinners] = useState([]);
 
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
@@ -83,6 +82,8 @@ function App () {
           console.log('New Game starting...');
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
+          setLastGuess('');
+          setWinners([]);
           setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
           setMessageLog((messageLog) => [
             ...messageLog,
@@ -94,6 +95,7 @@ function App () {
           const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
           setRoundDuration(secondsLeft);
           setDrawWord(null);
+          setLastGuess('');
           setGuess('');
           setShowGuessBox(true);
           setDisableGuessBox(false);
@@ -111,6 +113,7 @@ function App () {
         io.on('GE_WAIT_FOR_NEXT_ROUND', ({ previousWord, round, total }) => {
           setShowGuessBox(false);
           setDrawWord(null);
+          setLastGuess('');
           setPreviousWord(previousWord);
           setRoundInfo({ current: total - round + 1, total });
           setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
@@ -120,20 +123,46 @@ function App () {
           ]);
         });
 
-        io.on('GE_ANNOUNCE_WINNER', () => {
+        io.on('GE_ANNOUNCE_WINNER', (winners) => {
           setShowGuessBox(false);
           setDrawWord(null);
+          setLastGuess('');
+          setWinners(winners);
           console.log('Announce Winner');
           setShowGuessBox(false);
           setDrawWord(null);
           setGameState(GameStateConstants.GAME_STATE_ANNOUNCE_WINNER);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            'msgSystemWinner!!!Game Over, And the Winner is...'
-          ]);
+          if (winners) {
+            if (winners.length > 1) {
+              let winnersString = '';
+              winnersString = winners.reduce((accumulator, winner) => {
+                if (accumulator) {
+                  return `${accumulator}, ${winner.name}`;
+                } else {
+                  return winner.name;
+                }
+              }, '');
+              console.log(winnersString);
+              setMessageLog((messageLog) => [
+                ...messageLog,
+                `msgSystemWinner!!!Game Over, And the Winners are ${winnersString}`
+              ]);
+            } else {
+              setMessageLog((messageLog) => [
+                ...messageLog,
+                `msgSystemWinner!!!Game Over, And the Winner is ${winners[0].name}`
+              ]);
+            }
+          } else {
+            setMessageLog((messageLog) => [
+              ...messageLog,
+              'msgSystemWinner!!!Game Over, Wait for new game!'
+            ]);
+          }
         });
 
         io.on('GE_NEW_WORD', (word) => {
+          setLastGuess('');
           setDrawWord(word);
           setShowGuessBox(false);
           setMessageLog((messageLog) => [
@@ -259,7 +288,8 @@ function App () {
 
   const handleColorChange = (color) => {
     setCanvasOptions({
-      color: color
+      color: color,
+      enabled: canvasOptions.enabled
     });
   };
 
@@ -296,13 +326,14 @@ function App () {
               lastGuess,
               roundDuration
             }}
-            canvasOptions={canvasOptions}
+            canvasOptions={{ color: canvasOptions.color, enabled: !!drawWord }}
           />
         );
+
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
-        return <GameStateDisplay gameState={{ state: gameState, roundInfo }} />;
+        return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }} />;
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
-        return <GameStateDisplay gameState={{ state: gameState }} />;
+        return <GameStateDisplay gameState={{ state: gameState, winners }} />;
       default:
         break;
     }
@@ -365,8 +396,10 @@ function App () {
       <Hidden mdDown>
         <Grid item lg={3}>
           <Grid container>
-            <Grid item xs={10} className="userScoreContainer">
-              <UserScoreList userScores={userScores} />
+            <Grid item xs={10} className="userScoreGridItem">
+              <Paper elevation={3} className="userScoreContainer" >
+                <UserScoreList userScores={userScores} />
+              </Paper>
             </Grid>
             <Grid item xs={10} className="logWindowContainer">
               <LogWindow className="logWindow" messages={messageLog}></LogWindow>
@@ -375,6 +408,42 @@ function App () {
         </Grid>
       </Hidden>
     );
+  };
+
+  const renderBottomPane = () => {
+    if (gameState === GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND ||
+      gameState === GameStateConstants.GAME_STATE_IDLE ||
+      gameState === GameStateConstants.GAME_STATE_ANNOUNCE_WINNER) {
+      return <Hidden mdUp>
+        <Paper elevation={3} style={{ marginBottom: '10px', marginTop: '10px' }} >
+          <UserScoreList userScores={userScores} />
+        </Paper>
+      </Hidden>;
+    } else {
+      return <div>
+        {showGuessBox ? (
+          <TextField
+            className="guessBox"
+            id="txt-guess"
+            size="small"
+            ref={guessBoxRef}
+            disabled={disableGuessBox || isOnscreenKeyboardVisible}
+            label="Guess!"
+            value={guess}
+            variant="outlined"
+            onKeyDown={(e) => guessBoxPressed(e)}
+            onChange={(e) => {
+              setGuess(e.target.value);
+              if (keyboardRef.current) {
+                keyboardRef.current.setInput(e.target.value);
+              }
+            }}
+          />
+        ) : (
+          <Typography variant="h5">{drawWord}</Typography>
+        )}
+      </div>;
+    }
   };
 
   const renderMidPane = () => {
@@ -387,39 +456,17 @@ function App () {
               {renderGameState()}
             </Paper>
           </Grid>
-          <Grid item xs={11} md={9} lg={9} className="inputContainer">
-            <div>
-              {showGuessBox ? (
-                <TextField
-                  className="guessBox"
-                  id="txt-guess"
-                  size="small"
-                  ref={guessBoxRef}
-                  disabled={disableGuessBox || isOnscreenKeyboardVisible}
-                  label="Guess!"
-                  value={guess}
-                  variant="outlined"
-                  onKeyDown={(e) => guessBoxPressed(e)}
-                  onChange={(e) => {
-                    setGuess(e.target.value);
-                    if (keyboardRef.current) {
-                      keyboardRef.current.setInput(e.target.value);
-                    }
-                  }}
-                />
-              ) : (
-                <Typography variant="h5">{drawWord}</Typography>
-              )}
-            </div>
-          </Grid>
-          {renderKeyboard()}
           {previousWord ? (
             <Grid item xs={12}>
-              <Typography variant="body1">
+              <Typography variant="body1" style={{ marginTop: '10px' }}>
                   Previous word was {previousWord}
               </Typography>
             </Grid>
           ) : null}
+          <Grid item xs={11} md={9} lg={9} className="inputContainer">
+            {renderBottomPane()}
+          </Grid>
+          {renderKeyboard()}
         </Grid>
       </Grid>
     );
