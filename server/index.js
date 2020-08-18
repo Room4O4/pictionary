@@ -1,16 +1,20 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+
 const datastore = require('./datastore');
 const game = require('./game');
 const debug = require('debug')('pictionary.server');
-
+const path = require('path');
 const DEFAULT_ROOM = 'main';
 
 game.setSocketHandle(io);
 
+app.use(express.static(path.join(__dirname, 'build')));
+
 app.get('/', (req, res) => {
-  res.send('<h1>Hello world</h1>');
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 io.on('connection', (socket) => {

@@ -121,3 +121,7 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+#build folders
+client/build
+server/build
