@@ -103,11 +103,13 @@ function App () {
           setRoundInfo({ current: total - round + 1, total });
           setGameState(GameStateConstants.GAME_STATE_NEW_ROUND);
           console.log(`New Round starting, Round: ${round}, Total: ${total}`);
+          const innerMessage = `${currentDrawingUser.id.split('_')[0]} is drawing. Start guessing!`;
           setMessageLog((messageLog) => [
             ...messageLog,
             `msgSystem!!!New Round starting, Round: ${round}, Total: ${total}`,
-            `${currentDrawingUser.id} is drawing. Start guessing!`
+            `msgSystemImp!!!${innerMessage}`
           ]);
+          setLastGuess(innerMessage);
         });
 
         io.on('GE_WAIT_FOR_NEXT_ROUND', ({ previousWord, round, total }) => {
@@ -167,29 +169,17 @@ function App () {
           setShowGuessBox(false);
           setMessageLog((messageLog) => [
             ...messageLog,
-            "msgSystem!!!It's your turn, Draw!"
+            "msgSystemImp!!!It's your turn, Draw!"
           ]);
+          setLastGuess("It's your turn, Draw!");
         });
 
         io.on('GE_UPDATE_SCORE', (userScores) => {
           console.table(userScores);
           setUserScores(userScores);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            'msgSystem!!!Scores updated!'
-          ]);
         });
 
-        io.on('GE_UPDATE_GUESS', (lastGuess) => {
-          let message = '';
-          if (lastGuess.found) {
-            message = `${lastGuess.userName} has found the word!`;
-          } else {
-            message = `${lastGuess.userName} guessed ${lastGuess.guess}`;
-          }
-          setMessageLog((messageLog) => [...messageLog, message]);
-          setLastGuess(message);
-        });
+        io.on('GE_UPDATE_GUESS', cbUpdateGuess);
       });
       // Currently adding this line to prevent link check fails as setRoom is unused.
       // Once Rooms feature is implemented, this shall be used
@@ -200,6 +190,23 @@ function App () {
       console.log('playerNickname is null');
     }
   }, [playerNickname]);
+
+  function cbUpdateGuess (lastGuess) {
+    let message = '';
+    if (lastGuess.found) {
+      const innerMessage = `${lastGuess.userName} has found the word!`;
+      message = `msgSystemFoundWord!!!${innerMessage}`;
+      setLastGuess(innerMessage);
+    } else {
+      setCurrentUser(currentUser => {
+        const innerMessage = `[${lastGuess.userName}]: ${lastGuess.guess}`;
+        if (lastGuess.userName !== currentUser.name) { message = `msgSystemGuess!!!${innerMessage}`; }
+        setLastGuess(innerMessage);
+        return currentUser;
+      });
+    }
+    setMessageLog((messageLog) => [...messageLog, message]);
+  };
 
   useEffect(() => {
     if (userScores && currentUser) {

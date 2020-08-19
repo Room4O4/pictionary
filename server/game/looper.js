@@ -154,6 +154,9 @@ class Looper {
 
   startRound () {
     debug('start new round');
+    if (this.evalRoundHandle) {
+      clearTimeout(this.evalRoundHandle);
+    }
     this._gameState = this.GAME_STATE_ROUND_IN_PROGRESS;
     this._roundStarted = true;
     this._currentRoundStartTime = +new Date(); // record the timestamp during at which the round started.

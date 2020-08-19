@@ -12,10 +12,10 @@ const LogWindow = ({ messages, height }) => {
     const [messageType, actualMessage] = message.split('!!!');
 
     return (
-      <ListItem alignItems="flex-start">
+      <ListItem alignItems="flex-start" className={`logMessageText ${messageType}`}>
         <ListItemText>
-          <Typography variant="body2" className={messageType}>
-            {actualMessage}
+          <Typography variant="body6">
+            <span >{actualMessage}</span>
           </Typography>
         </ListItemText>
       </ListItem>

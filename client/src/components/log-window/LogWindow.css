@@ -3,10 +3,36 @@
   height: 42vh;
 }
 
+.logMessageText {
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: small;
+}
 .msgSystem {
   color: black;
 }
 
+.msgSystemImp {
+  color: red;
+  font-weight: bold;
+}
+
+.msgSystemGuess {
+  color: blue;
+  font-weight: 500;
+}
+
 .msgUserGuess {
   color: blue;
+  font-style: oblique;
+}
+
+.msgSystemFoundWord {
+  color: red;
+  font-weight: bold;
+}
+
+.msgSystemWinner {
+  color:darkgreen;
+  font-weight: bold;
 }
