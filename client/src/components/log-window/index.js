@@ -24,7 +24,7 @@ const LogWindow = ({ messages, height }) => {
 
   useEffect(() => {
     if (listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
+      listRef.current.scrollIntoView(false);
     }
   });
 
