@@ -188,11 +188,11 @@ const Canvas = ({ io, canvasOptions }) => {
       onMouseDown={(e) => onMouseDown(e)}
       onMouseUp={(e) => onMouseUp(e)}
       onMouseOut={(e) => onMouseUp(e)}
-      onMouseMove={(e) => throttle(onMouseMove(e), 10)}
+      onMouseMove={(e) => throttle(onMouseMove(e), 5)}
       onTouchStart={(e) => onMouseDown(e)}
       onTouchEnd={(e) => onMouseUp(e)}
       onTouchCancel={(e) => onMouseUp(e)}
-      onTouchMove={(e) => throttle(onMouseMove(e), 10)}
+      onTouchMove={(e) => throttle(onMouseMove(e), 5)}
       ref={canvasRef}
     />
   );
