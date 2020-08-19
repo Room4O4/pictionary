@@ -26,6 +26,8 @@ class Looper {
     this._roomEventBridge.on('C_S_LEAVE_ROOM', (userId) => {
       this.removeUser(userId);
     });
+    this.foundUsersCount = 0;
+    this.evalRoundHandle = null;
   }
 
   addUser (dbUser, socketId) {
@@ -77,6 +79,10 @@ class Looper {
     }
   }
 
+  hasEveryoneFoundTheWord () {
+    return (this.foundUsersCount >= (this._users.length - 1));
+  }
+
   evaluateGuess (userId, guess) {
     if (!guess) return;
     if (guess.trim().toLowerCase() === this._currentWord.trim().toLowerCase()) {
@@ -85,6 +91,7 @@ class Looper {
       if (foundUser) {
         foundUser.score += 10;
         const currentDrawingUser = this._users[this._currentUserDrawIndex];
+        this.foundUsersCount = this.foundUsersCount + 1;
         if (currentDrawingUser) {
           currentDrawingUser.score += 3;
           this._roomEventBridge.broadcastScores(this._users);
@@ -94,6 +101,12 @@ class Looper {
             guess,
             true
           );
+
+          // If everyone found the word, just stop the round and go on to the next round
+          if (this.hasEveryoneFoundTheWord()) {
+            clearTimeout(this.evalRoundHandle);
+            this.evaluateRound();
+          }
         }
       }
     } else {
@@ -144,6 +157,7 @@ class Looper {
     this._gameState = this.GAME_STATE_ROUND_IN_PROGRESS;
     this._roundStarted = true;
     this._currentRoundStartTime = +new Date(); // record the timestamp during at which the round started.
+    this.foundUsersCount = 0;
 
     // Assign a user to draw
     this._currentUserDrawIndex =
@@ -152,6 +166,7 @@ class Looper {
     debug('Current User Drawing - ', currentDrawingUser);
     // Sometimes the currentDrawing user quits while its his turn to draw. SKIP the round!
     if (!currentDrawingUser) {
+      clearTimeout(this.evalRoundHandle);
       this.evaluateRound();
       return;
     }
@@ -175,13 +190,14 @@ class Looper {
 
     // start Timer
     const that = this;
-    setTimeout(() => that.evaluateRound(), this.ROUND_DURATION);
+    this.evalRoundHandle = setTimeout(() => that.evaluateRound(), this.ROUND_DURATION);
   }
 
   _resetScores () {
     this._users.forEach((user) => {
       user.score = 0;
     });
+    this.foundUsersCount = 0;
   }
 
   stopGame () {
