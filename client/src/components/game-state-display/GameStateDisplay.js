@@ -38,7 +38,7 @@ const GameStateDisplay = ({ gameState, canvasOptions }) => {
         return (
           <GameArea
             socket={gameState.socket}
-            lastGuess={gameState.lastGuess}
+            liveMessage={gameState.liveMessage}
             roundDuration={gameState.roundDuration}
             canvasOptions={canvasOptions}
           />

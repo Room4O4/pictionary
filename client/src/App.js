@@ -46,7 +46,7 @@ function App () {
   );
   const [canvasOptions, setCanvasOptions] = useState({ color: '#000000' });
   const [messageLog, setMessageLog] = useState([]);
-  const [lastGuess, setLastGuess] = useState('');
+  const [liveMessage, setLiveMessage] = useState('');
   const [winners, setWinners] = useState([]);
 
   const guessBoxRef = useRef(null);
@@ -82,7 +82,7 @@ function App () {
           console.log('New Game starting...');
           setRoundDuration(roundDuration / 1000);
           setCurrentUser({ ...user, score: 0 });
-          setLastGuess('');
+          setLiveMessage('');
           setWinners([]);
           setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
           setMessageLog((messageLog) => [
@@ -95,7 +95,7 @@ function App () {
           const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
           setRoundDuration(secondsLeft);
           setDrawWord(null);
-          setLastGuess('');
+          setLiveMessage('');
           setGuess('');
           setShowGuessBox(true);
           setDisableGuessBox(false);
@@ -106,16 +106,16 @@ function App () {
           const innerMessage = `${currentDrawingUser.id.split('_')[0]} is drawing. Start guessing!`;
           setMessageLog((messageLog) => [
             ...messageLog,
-            `msgSystem!!!New Round starting, Round: ${round}, Total: ${total}`,
+            `msgSystem!!!New Round starting, Round: ${(total - round + 1)}, Total: ${total}`,
             `msgSystemImp!!!${innerMessage}`
           ]);
-          setLastGuess(innerMessage);
+          setLiveMessage(`msgSystemImp!!!${innerMessage}`);
         });
 
         io.on('GE_WAIT_FOR_NEXT_ROUND', ({ previousWord, round, total }) => {
           setShowGuessBox(false);
           setDrawWord(null);
-          setLastGuess('');
+          setLiveMessage('');
           setPreviousWord(previousWord);
           setRoundInfo({ current: total - round + 1, total });
           setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
@@ -128,7 +128,7 @@ function App () {
         io.on('GE_ANNOUNCE_WINNER', (winners) => {
           setShowGuessBox(false);
           setDrawWord(null);
-          setLastGuess('');
+          setLiveMessage('');
           setWinners(winners);
           console.log('Announce Winner');
           setShowGuessBox(false);
@@ -164,14 +164,14 @@ function App () {
         });
 
         io.on('GE_NEW_WORD', (word) => {
-          setLastGuess('');
+          setLiveMessage('');
           setDrawWord(word);
           setShowGuessBox(false);
           setMessageLog((messageLog) => [
             ...messageLog,
             "msgSystemImp!!!It's your turn, Draw!"
           ]);
-          setLastGuess("It's your turn, Draw!");
+          setLiveMessage("msgSystemImp!!!It's your turn, Draw!");
         });
 
         io.on('GE_UPDATE_SCORE', (userScores) => {
@@ -191,17 +191,18 @@ function App () {
     }
   }, [playerNickname]);
 
-  function cbUpdateGuess (lastGuess) {
+  function cbUpdateGuess (liveMessage) {
     let message = '';
-    if (lastGuess.found) {
-      const innerMessage = `${lastGuess.userName} has found the word!`;
+    if (liveMessage.found) {
+      const innerMessage = `${liveMessage.userName} has found the word!`;
       message = `msgSystemFoundWord!!!${innerMessage}`;
-      setLastGuess(innerMessage);
+      setLiveMessage(message);
     } else {
       setCurrentUser(currentUser => {
-        const innerMessage = `[${lastGuess.userName}]: ${lastGuess.guess}`;
-        if (lastGuess.userName !== currentUser.name) { message = `msgSystemGuess!!!${innerMessage}`; }
-        setLastGuess(innerMessage);
+        const innerMessage = `[${liveMessage.userName}]: ${liveMessage.guess}`;
+        if (liveMessage.userName !== currentUser.name) { message = `msgSystemGuess!!!${innerMessage}`; }
+        // The above check doesn't apply to the liveMessage area
+        setLiveMessage(`msgSystemGuess!!!${innerMessage}`);
         return currentUser;
       });
     }
@@ -330,7 +331,7 @@ function App () {
             gameState={{
               state: gameState,
               socket: socketIO,
-              lastGuess,
+              liveMessage,
               roundDuration
             }}
             canvasOptions={{ color: canvasOptions.color, enabled: !!drawWord }}

@@ -4,12 +4,12 @@ import FadeOutText from './anim/FadeOutText';
 import ReactCountdownClock from 'react-countdown-clock';
 import './game-area.css';
 
-const GameArea = ({ socket, lastGuess, roundDuration, canvasOptions }) => {
+const GameArea = ({ socket, liveMessage, roundDuration, canvasOptions }) => {
   return (
     <Fragment>
       <Canvas io={socket} canvasOptions={canvasOptions}/>
       <div className="live-message">
-        <FadeOutText text={lastGuess}></FadeOutText>
+        <FadeOutText text={liveMessage}></FadeOutText>
       </div>
       <div className="timer">
         <ReactCountdownClock
