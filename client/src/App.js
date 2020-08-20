@@ -434,7 +434,8 @@ function App () {
             className="guessBox"
             id="txt-guess"
             size="small"
-            ref={guessBoxRef}
+            autoComplete="off"
+            inputRef={input => input && input.focus()}
             disabled={disableGuessBox || isOnscreenKeyboardVisible}
             label="Guess!"
             value={guess}
