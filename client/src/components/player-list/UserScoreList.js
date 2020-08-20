@@ -5,12 +5,13 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from 'react-avatar';
 import { Typography } from '@material-ui/core';
-
+import CreateIcon from '@material-ui/icons/Create';
 import './UserScoreList.css';
 
 const buildUserList = (userScores) => {
   if (!userScores) return null;
   const renderUsers = userScores.map((userScore) => {
+    const usernameListClass = userScore.roundInfo.foundWord ? 'userFoundWord userHighlight' : (userScore.roundInfo.isDrawing ? 'userHighlight' : '');
     return (
       <ListItem
         id={userScore.id}
@@ -18,21 +19,22 @@ const buildUserList = (userScores) => {
         className="userScoreListItem"
       >
         <ListItemAvatar>
-          <Avatar
+          {!userScore.roundInfo.isDrawing ? <Avatar
             name={userScore.name}
             round={true}
             size="30"
             textSizeRatio={1.75}
-          />
+          /> : <CreateIcon />}
+
         </ListItemAvatar>
         <ListItemText>
           <Typography variant="body1" className="userScoreListItemId">
-            {userScore.name}
+            <span className={`${usernameListClass}`}>{userScore.name}</span>
           </Typography>
         </ListItemText>
         <ListItemText className="userScoreListItemPoints">
           <Typography variant="body1" >
-            {userScore.score}
+            <span className={`${usernameListClass}`}>{userScore.score}</span>
           </Typography>
         </ListItemText>
       </ListItem>

@@ -174,9 +174,9 @@ function App () {
           setLiveMessage("msgSystemImp!!!It's your turn, Draw!");
         });
 
-        io.on('GE_UPDATE_SCORE', (userScores) => {
-          console.table(userScores);
-          setUserScores(userScores);
+        io.on('GE_UPDATE_SCORE', (updatedUserScores) => {
+          console.table(updatedUserScores);
+          setUserScores(updatedUserScores);
         });
 
         io.on('GE_UPDATE_GUESS', cbUpdateGuess);

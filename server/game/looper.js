@@ -33,7 +33,7 @@ class Looper {
   addUser (dbUser, socketId) {
     const foundUser = this._users.find((user) => dbUser.id === user.id);
     if (!foundUser) {
-      this._users.push({ id: dbUser.id, name: dbUser.name, score: 0 });
+      this._users.push({ id: dbUser.id, name: dbUser.name, score: 0, roundInfo: { foundWord: false, isDrawing: false } });
     } else {
       console.log('user already in room');
     }
@@ -83,6 +83,13 @@ class Looper {
     return (this.foundUsersCount >= (this._users.length - 1));
   }
 
+  clearRoundInfoForAllUsers () {
+    this._users.forEach(user => {
+      user.roundInfo.foundWord = false;
+      user.roundInfo.isDrawing = false;
+    });
+  }
+
   evaluateGuess (userId, guess) {
     if (!guess) return;
     if (guess.trim().toLowerCase() === this._currentWord.trim().toLowerCase()) {
@@ -90,6 +97,7 @@ class Looper {
       const foundUser = this._users.find((user) => userId === user.id);
       if (foundUser) {
         foundUser.score += Math.max(5, 10 - this.foundUsersCount); // The first to score gets 10 points and it goes down till 5 points
+        foundUser.roundInfo.foundWord = true;
         this.foundUsersCount = this.foundUsersCount + 1;
         const currentDrawingUser = this._users[this._currentUserDrawIndex];
         if (currentDrawingUser) {
@@ -160,6 +168,10 @@ class Looper {
     if (this.evalRoundHandle) {
       clearTimeout(this.evalRoundHandle);
     }
+
+    // clear roundInfo.foundWord and roundInfo.isDrawing
+    this.clearRoundInfoForAllUsers();
+
     this._gameState = this.GAME_STATE_ROUND_IN_PROGRESS;
     this._roundStarted = true;
     this._currentRoundStartTime = +new Date(); // record the timestamp during at which the round started.
@@ -169,6 +181,9 @@ class Looper {
     this._currentUserDrawIndex =
       (this._totalRounds - this._roundsLeft) % this._users.length;
     const currentDrawingUser = this._users[this._currentUserDrawIndex];
+    currentDrawingUser.roundInfo.isDrawing = true;
+    this._roomEventBridge.broadcastScores(this._users);
+
     debug('Current User Drawing - ', currentDrawingUser);
     // Sometimes the currentDrawing user quits while its his turn to draw. SKIP the round!
     if (!currentDrawingUser) {

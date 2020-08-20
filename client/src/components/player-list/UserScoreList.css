@@ -15,3 +15,11 @@
 .userScoreListItemPoints {
   flex-grow: 0;
 }
+
+.userHighlight {
+  font-weight: bold;
+}
+
+.userFoundWord {
+  color: red;
+}
