@@ -89,9 +89,9 @@ class Looper {
       debug('Correct guess by user - ', userId);
       const foundUser = this._users.find((user) => userId === user.id);
       if (foundUser) {
-        foundUser.score += 10;
-        const currentDrawingUser = this._users[this._currentUserDrawIndex];
+        foundUser.score += Math.max(5, 10 - this.foundUsersCount); // The first to score gets 10 points and it goes down till 5 points
         this.foundUsersCount = this.foundUsersCount + 1;
+        const currentDrawingUser = this._users[this._currentUserDrawIndex];
         if (currentDrawingUser) {
           currentDrawingUser.score += 3;
           this._roomEventBridge.broadcastScores(this._users);
@@ -104,8 +104,11 @@ class Looper {
 
           // If everyone found the word, just stop the round and go on to the next round
           if (this.hasEveryoneFoundTheWord()) {
-            clearTimeout(this.evalRoundHandle);
-            this.evaluateRound();
+            const that = this;
+            setTimeout(() => {
+              clearTimeout(that.evalRoundHandle);
+              that.evaluateRound();
+            }, 2000);
           }
         }
       }
