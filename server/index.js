@@ -29,7 +29,7 @@ io.on('connection', (socket) => {
   socket.on('C_S_LOGIN', async (user, room) => {
     try {
       // log in the user
-      const loginResult = await datastore.login(user);
+      await datastore.login(user);
 
       // Join the socket to the room
       socket.join(room || DEFAULT_ROOM);
@@ -37,7 +37,7 @@ io.on('connection', (socket) => {
       // automatically add the user to the default room
       await game.addNewUser(user.id, socket.id, room || DEFAULT_ROOM);
 
-      socket.emit('S_C_LOGIN', loginResult);
+      socket.emit('S_C_LOGIN', user);
     } catch (error) {
       debug('Error Logging in - ', error);
       socket.disconnect();

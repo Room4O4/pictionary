@@ -68,118 +68,31 @@ function App () {
           name: `${playerNickname}`,
           score: 0
         };
+        console.log('Socket connected', user);
+
         io.emit('C_S_LOGIN', user, room);
-        io.on('S_C_LOGIN', () => {
-          console.log('Login success');
-          setCurrentUser(user);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            'msgSystem!!!Logged in'
-          ]);
-        });
 
-        io.on('GE_NEW_GAME', (roundDuration) => {
-          console.log('New Game starting...');
-          setRoundDuration(roundDuration / 1000);
-          setCurrentUser({ ...user, score: 0 });
-          setLiveMessage('');
-          setWinners([]);
-          setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            'msgSystem!!!New Game starting...'
-          ]);
-        });
-
-        io.on('GE_NEW_ROUND', ({ round, total, currentDrawingUser, startTimestamp }) => {
-          const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
-          setRoundDuration(secondsLeft);
-          setDrawWord(null);
-          setLiveMessage('');
-          setGuess('');
-          setShowGuessBox(true);
-          setDisableGuessBox(false);
-          setPreviousWord(null);
-          setRoundInfo({ current: total - round + 1, total });
-          setGameState(GameStateConstants.GAME_STATE_NEW_ROUND);
-          console.log(`New Round starting, Round: ${round}, Total: ${total}`);
-          const innerMessage = `${currentDrawingUser.id.split('_')[0]} is drawing. Start guessing!`;
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            `msgSystem!!!New Round starting, Round: ${(total - round + 1)}, Total: ${total}`,
-            `msgSystemImp!!!${innerMessage}`
-          ]);
-          setLiveMessage(`msgSystemImp!!!${innerMessage}`);
-        });
-
-        io.on('GE_WAIT_FOR_NEXT_ROUND', ({ previousWord, round, total }) => {
-          setShowGuessBox(false);
-          setDrawWord(null);
-          setLiveMessage('');
-          setPreviousWord(previousWord);
-          setRoundInfo({ current: total - round + 1, total });
-          setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            'msgSystem!!!Round finished, Wait for next round...'
-          ]);
-        });
-
-        io.on('GE_ANNOUNCE_WINNER', (winners) => {
-          setShowGuessBox(false);
-          setDrawWord(null);
-          setLiveMessage('');
-          setWinners(winners);
-          console.log('Announce Winner');
-          setShowGuessBox(false);
-          setDrawWord(null);
-          setGameState(GameStateConstants.GAME_STATE_ANNOUNCE_WINNER);
-          if (winners) {
-            if (winners.length > 1) {
-              let winnersString = '';
-              winnersString = winners.reduce((accumulator, winner) => {
-                if (accumulator) {
-                  return `${accumulator}, ${winner.name}`;
-                } else {
-                  return winner.name;
-                }
-              }, '');
-              console.log(winnersString);
-              setMessageLog((messageLog) => [
-                ...messageLog,
-                `msgSystemWinner!!!Game Over, And the Winners are ${winnersString}`
-              ]);
-            } else {
-              setMessageLog((messageLog) => [
-                ...messageLog,
-                `msgSystemWinner!!!Game Over, And the Winner is ${winners[0].name}`
-              ]);
-            }
-          } else {
-            setMessageLog((messageLog) => [
-              ...messageLog,
-              'msgSystemWinner!!!Game Over, Wait for new game!'
-            ]);
-          }
-        });
-
-        io.on('GE_NEW_WORD', (word) => {
-          setLiveMessage('');
-          setDrawWord(word);
-          setShowGuessBox(false);
-          setMessageLog((messageLog) => [
-            ...messageLog,
-            "msgSystemImp!!!It's your turn, Draw!"
-          ]);
-          setLiveMessage("msgSystemImp!!!It's your turn, Draw!");
-        });
-
-        io.on('GE_UPDATE_SCORE', (updatedUserScores) => {
-          console.table(updatedUserScores);
-          setUserScores(updatedUserScores);
-        });
-
+        io.on('S_C_LOGIN', cbSCLogin);
+        io.on('GE_NEW_GAME', cbNewGame);
+        io.on('GE_NEW_ROUND', cbNewRound);
+        io.on('GE_WAIT_FOR_NEXT_ROUND', cbWaitForNextRound);
+        io.on('GE_ANNOUNCE_WINNER', cbAnnounceWinner);
+        io.on('GE_NEW_WORD', cbNewWord);
+        io.on('GE_UPDATE_SCORE', cbUpdateScore);
         io.on('GE_UPDATE_GUESS', cbUpdateGuess);
+
+        io.on('disconnect', () => {
+          console.log('Socket disconnected', user);
+          io.removeEventListener('S_C_LOGIN', cbSCLogin);
+          io.removeEventListener('GE_NEW_GAME', cbNewGame);
+          io.removeEventListener('GE_NEW_ROUND', cbNewRound);
+          io.removeEventListener('GE_WAIT_FOR_NEXT_ROUND', cbWaitForNextRound);
+          io.removeEventListener('GE_ANNOUNCE_WINNER', cbAnnounceWinner);
+          io.removeEventListener('GE_NEW_WORD', cbNewWord);
+          io.removeEventListener('GE_UPDATE_SCORE', cbUpdateScore);
+          io.removeEventListener('GE_UPDATE_GUESS', cbUpdateGuess);
+          setCurrentUser(null);
+        });
       });
       // Currently adding this line to prevent link check fails as setRoom is unused.
       // Once Rooms feature is implemented, this shall be used
@@ -191,7 +104,118 @@ function App () {
     }
   }, [playerNickname]);
 
-  function cbUpdateGuess (liveMessage) {
+  const cbNewWord = (word) => {
+    setLiveMessage('');
+    setDrawWord(word);
+    setShowGuessBox(false);
+    setMessageLog((messageLog) => [
+      ...messageLog,
+      "msgSystemImp!!!It's your turn, Draw!"
+    ]);
+    setLiveMessage("msgSystemImp!!!It's your turn, Draw!");
+  };
+
+  const cbAnnounceWinner = (winners) => {
+    setShowGuessBox(false);
+    setDrawWord(null);
+    setLiveMessage('');
+    setWinners(winners);
+    console.log('Announce Winner');
+    setShowGuessBox(false);
+    setDrawWord(null);
+    setGameState(GameStateConstants.GAME_STATE_ANNOUNCE_WINNER);
+    if (winners) {
+      if (winners.length > 1) {
+        let winnersString = '';
+        winnersString = winners.reduce((accumulator, winner) => {
+          if (accumulator) {
+            return `${accumulator}, ${winner.name}`;
+          } else {
+            return winner.name;
+          }
+        }, '');
+        console.log(winnersString);
+        setMessageLog((messageLog) => [
+          ...messageLog,
+          `msgSystemWinner!!!Game Over, And the Winners are ${winnersString}`
+        ]);
+      } else {
+        setMessageLog((messageLog) => [
+          ...messageLog,
+          `msgSystemWinner!!!Game Over, And the Winner is ${winners[0].name}`
+        ]);
+      }
+    } else {
+      setMessageLog((messageLog) => [
+        ...messageLog,
+        'msgSystemWinner!!!Game Over, Wait for new game!'
+      ]);
+    }
+  };
+
+  const cbWaitForNextRound = ({ previousWord, round, total }) => {
+    setShowGuessBox(false);
+    setDrawWord(null);
+    setLiveMessage('');
+    setPreviousWord(previousWord);
+    setRoundInfo({ current: total - round + 1, total });
+    setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
+    setMessageLog((messageLog) => [
+      ...messageLog,
+      'msgSystem!!!Round finished, Wait for next round...'
+    ]);
+  };
+
+  const cbNewRound = ({ round, total, currentDrawingUser, startTimestamp }) => {
+    const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
+    setRoundDuration(secondsLeft);
+    setDrawWord(null);
+    setLiveMessage('');
+    setGuess('');
+    setShowGuessBox(true);
+    setDisableGuessBox(false);
+    setPreviousWord(null);
+    setRoundInfo({ current: total - round + 1, total });
+    setGameState(GameStateConstants.GAME_STATE_NEW_ROUND);
+    console.log(`New Round starting, Round: ${round}, Total: ${total}`);
+    const innerMessage = `${currentDrawingUser.id.split('_')[0]} is drawing. Start guessing!`;
+    setMessageLog((messageLog) => [
+      ...messageLog,
+      `msgSystem!!!New Round starting, Round: ${(total - round + 1)}, Total: ${total}`,
+      `msgSystemImp!!!${innerMessage}`
+    ]);
+    setLiveMessage(`msgSystemImp!!!${innerMessage}`);
+  };
+
+  const cbNewGame = (roundDuration) => {
+    console.log('New Game starting...');
+    setRoundDuration(roundDuration / 1000);
+    setCurrentUser((currentUser) => { return { ...currentUser, score: 0 }; });
+    setLiveMessage('');
+    setWinners([]);
+    setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
+    setMessageLog((messageLog) => [
+      ...messageLog,
+      'msgSystem!!!New Game starting...'
+    ]);
+  };
+
+  const cbSCLogin = (loggedInUser) => {
+    console.log('Login success');
+    setCurrentUser(loggedInUser);
+    setMessageLog((messageLog) => [
+      ...messageLog,
+      'msgSystem!!!Logged in'
+    ]);
+  };
+
+  const cbUpdateScore = (updatedUserScores) => {
+    console.log('Received GE_UPDATE_SCORE');
+    console.table(updatedUserScores);
+    setUserScores(updatedUserScores);
+  };
+
+  const cbUpdateGuess = (liveMessage) => {
     let message = '';
     if (liveMessage.found) {
       const innerMessage = `${liveMessage.userName} has found the word!`;
