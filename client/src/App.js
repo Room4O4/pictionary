@@ -61,7 +61,7 @@ function App () {
 
   useEffect(() => {
     if (playerNickname) {
-      const io = socket('http://192.168.1.8:3001');
+      const io = socket('http://localhost:3001');
       io.on('connect', () => {
         const user = {
           id: `${playerNickname}_${+new Date()}`,
