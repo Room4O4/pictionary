@@ -2,9 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import socket from 'socket.io-client';
 import { TextField, Hidden, IconButton, Badge, Paper, Toolbar, SvgIcon } from '@material-ui/core';
 import { StylesProvider } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
 import Grid from '@material-ui/core/Grid';
-import Keyboard from 'react-simple-keyboard';
 import ElementResizeDetectorMaker from 'element-resize-detector';
 import Typography from '@material-ui/core/Typography';
 import { ReactComponent as AppLogo } from './assets/logo.svg';
@@ -17,11 +15,9 @@ import PlayersIcon from './components/icons/PlayersIcon';
 import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
 import * as GameStateConstants from './constants/AppConstants';
 import GameStateDisplay from './components/game-state-display/GameStateDisplay';
-import { OnScreenKeyboardLayout, OnScreenKeyboardDisplay } from './constants/KeyboardLayout';
+import CanvasToolbox from './components/toolbox';
 
 import './App.css';
-import 'react-simple-keyboard/build/css/index.css';
-import CanvasToolbox from './components/toolbox';
 
 const DEFAULT_ROOM = 'main';
 const ROUND_DURATION = 60;
@@ -32,7 +28,6 @@ function App () {
   const [drawWord, setDrawWord] = useState(null);
   const [playerNickname, setPlayerNickname] = useState(null);
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
-  const [layoutName, setLayoutName] = useState('default');
   const [showGuessBox, setShowGuessBox] = useState(false);
   const [disableGuessBox, setDisableGuessBox] = useState(true);
   const [guess, setGuess] = useState('');
@@ -52,8 +47,6 @@ function App () {
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
   const canvasPaperRef = useRef(null);
-
-  const isOnscreenKeyboardVisible = useMediaQuery('(max-width:600px)');
 
   useEffect(() => {
     if (guessBoxRef && guessBoxRef.current) guessBoxRef.current.focus();
@@ -116,11 +109,12 @@ function App () {
     setLiveMessage("msgSystemImp!!!It's your turn, Draw!");
   };
 
-  const cbAnnounceWinner = (winners) => {
+  const cbAnnounceWinner = ({ previousWord, winners }) => {
     console.log('EVENT GE_ANNOUNCE_WINNER');
     setShowGuessBox(false);
     setLiveMessage('');
     setWinners(winners);
+    setPreviousWord(previousWord);
     console.log('Announce Winner');
     setShowGuessBox(false);
     setDrawWord(null);
@@ -160,7 +154,7 @@ function App () {
     setDrawWord(null);
     setLiveMessage('');
     setPreviousWord(previousWord);
-    setRoundInfo({ current: total - round + 1, total });
+    setRoundInfo({ current: total - round, total });
     setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
     setMessageLog((messageLog) => [
       ...messageLog,
@@ -299,29 +293,6 @@ function App () {
     setPlayerNickname(nickname);
   };
 
-  const onKeyboardInputChange = (input) => {
-    setGuess(input);
-  };
-
-  const onKeyPress = (button) => {
-    if (button === '{ent}') {
-      sendGuessToServer();
-      resetGuess();
-    } else if (button === '{shift}' || button === '{lock}') {
-      handleShift();
-    } else if (button === '{numbers}' || button === '{abc}') {
-      handleNumbers();
-    }
-  };
-
-  const handleShift = () => {
-    setLayoutName(layoutName === 'default' ? 'shift' : 'default');
-  };
-
-  const handleNumbers = () => {
-    setLayoutName(layoutName === 'default' ? 'numbers' : 'default');
-  };
-
   const handleColorChange = (color) => {
     setCanvasOptions({
       color: color,
@@ -373,27 +344,6 @@ function App () {
       default:
         break;
     }
-  };
-
-  const renderKeyboard = () => {
-    return (
-      <Hidden smUp>
-        <Grid item xs={11} className="keyboardContainer">
-          {showGuessBox ? (
-            <Keyboard
-              keyboardRef={(r) => (keyboardRef.current = r)}
-              onChange={onKeyboardInputChange}
-              onKeyPress={onKeyPress}
-              autoUseTouchEvents={true}
-              mergeDisplay={true}
-              layoutName={layoutName}
-              layout={OnScreenKeyboardLayout}
-              display= {OnScreenKeyboardDisplay}
-            />
-          ) : null}
-        </Grid>
-      </Hidden>
-    );
   };
 
   const renderCanvasToolbox = () => {
@@ -465,7 +415,7 @@ function App () {
             size="small"
             autoComplete="off"
             inputRef={input => input && input.focus()}
-            disabled={disableGuessBox || isOnscreenKeyboardVisible}
+            disabled={disableGuessBox}
             label="Guess!"
             value={guess}
             variant="outlined"
@@ -505,7 +455,6 @@ function App () {
           <Grid item xs={11} md={9} lg={9} className="inputContainer">
             {renderBottomPane()}
           </Grid>
-          {renderKeyboard()}
         </Grid>
       </Grid>
     );
