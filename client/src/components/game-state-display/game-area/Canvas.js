@@ -78,8 +78,12 @@ const Canvas = ({ io, canvasOptions }) => {
   // make the canvas fill its parent
   // Ref - https://stackoverflow.com/a/10215724
   function onResize (e) {
+    // For some reason, the useEffect callback is not called after the canvas reaches its full size
+    // Hence the offsetHeight seems to be zero for the first time in mobile
+    // WORKAROUND: Set canvasRef.current.height using the offsetWidth itself.
+    // It is anyway going to be a square canvas
     canvasRef.current.width = canvasRef.current.offsetWidth;
-    canvasRef.current.height = canvasRef.current.offsetHeight;
+    canvasRef.current.height = canvasRef.current.offsetWidth;
     // restoreCanvas(coordinates.current);
   }
 
@@ -140,9 +144,9 @@ const Canvas = ({ io, canvasOptions }) => {
     const scaleY = canvasRef.current.height / rect.height; // relationship bitmap vs. element for Y
     const inputX = e.clientX || e.touches[0].clientX;
     const inputY = e.clientY || e.touches[0].clientY;
-
     var x = (inputX - rect.left) * scaleX; // x position within the element.
     var y = (inputY - rect.top) * scaleY; // y position within the element.
+
     drawLine(current.x, current.y, x, y, canvasOptions.color, true);
   }
 

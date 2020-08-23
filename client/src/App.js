@@ -44,7 +44,7 @@ function App () {
   const [gameState, setGameState] = useState(
     GameStateConstants.GAME_STATE_IDLE
   );
-  const [canvasOptions, setCanvasOptions] = useState({ color: '#000000' });
+  const [canvasOptions, setCanvasOptions] = useState({ color: '#000000', enabled: true });
   const [messageLog, setMessageLog] = useState([]);
   const [liveMessage, setLiveMessage] = useState('');
   const [winners, setWinners] = useState([]);
@@ -61,7 +61,7 @@ function App () {
 
   useEffect(() => {
     if (playerNickname) {
-      const io = socket('http://localhost:3001');
+      const io = socket('http://192.168.1.8:3001');
       io.on('connect', () => {
         const user = {
           id: `${playerNickname}_${+new Date()}`,
@@ -105,6 +105,7 @@ function App () {
   }, [playerNickname]);
 
   const cbNewWord = (word) => {
+    console.log('EVENT GE_NEW_WORD');
     setLiveMessage('');
     setDrawWord(word);
     setShowGuessBox(false);
@@ -116,8 +117,8 @@ function App () {
   };
 
   const cbAnnounceWinner = (winners) => {
+    console.log('EVENT GE_ANNOUNCE_WINNER');
     setShowGuessBox(false);
-    setDrawWord(null);
     setLiveMessage('');
     setWinners(winners);
     console.log('Announce Winner');
@@ -154,6 +155,7 @@ function App () {
   };
 
   const cbWaitForNextRound = ({ previousWord, round, total }) => {
+    console.log('EVENT GE_WAIT_FOR_NEW_ROUND');
     setShowGuessBox(false);
     setDrawWord(null);
     setLiveMessage('');
@@ -167,6 +169,7 @@ function App () {
   };
 
   const cbNewRound = ({ round, total, currentDrawingUser, startTimestamp }) => {
+    console.log('EVENT GE_NEW_ROUND');
     const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
     setRoundDuration(secondsLeft);
     setDrawWord(null);
@@ -188,7 +191,7 @@ function App () {
   };
 
   const cbNewGame = (roundDuration) => {
-    console.log('New Game starting...');
+    console.log('EVENT GE_NEW_GAME');
     setRoundDuration(roundDuration / 1000);
     setCurrentUser((currentUser) => { return { ...currentUser, score: 0 }; });
     setLiveMessage('');
@@ -201,7 +204,7 @@ function App () {
   };
 
   const cbSCLogin = (loggedInUser) => {
-    console.log('Login success');
+    console.log('EVENT S_C_LOGIN');
     setCurrentUser(loggedInUser);
     setMessageLog((messageLog) => [
       ...messageLog,
@@ -210,12 +213,13 @@ function App () {
   };
 
   const cbUpdateScore = (updatedUserScores) => {
-    console.log('Received GE_UPDATE_SCORE');
+    console.log('EVENT GE_UPDATE_SCORE');
     console.table(updatedUserScores);
     setUserScores(updatedUserScores);
   };
 
   const cbUpdateGuess = (liveMessage) => {
+    console.log('EVENT GE_UPDATE_GUESS');
     let message = '';
     if (liveMessage.found) {
       const innerMessage = `${liveMessage.userName} has found the word!`;
@@ -454,6 +458,7 @@ function App () {
     } else {
       return <div>
         {showGuessBox ? (
+
           <TextField
             className="guessBox"
             id="txt-guess"
@@ -472,6 +477,7 @@ function App () {
               }
             }}
           />
+
         ) : (
           <Typography variant="h5">{drawWord}</Typography>
         )}
