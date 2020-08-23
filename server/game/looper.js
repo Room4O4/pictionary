@@ -163,6 +163,20 @@ class Looper {
     }
   }
 
+  getDifficultyLevel (roundsLeft, totalRounds) {
+    const roundsLeftPercentage = (1 - (roundsLeft / totalRounds)) * 100;
+    let difficultyLevel = 'easy';
+    if (roundsLeftPercentage > 66) {
+      difficultyLevel = 'hard';
+    } else if (roundsLeftPercentage > 33) {
+      difficultyLevel = 'medium';
+    } else {
+      difficultyLevel = 'easy';
+    }
+    debug(`Round ${totalRounds - roundsLeft + 1} : Difficulty Level ${difficultyLevel}`);
+    return difficultyLevel;
+  }
+
   startRound () {
     debug('start new round');
     if (this.evalRoundHandle) {
@@ -192,8 +206,9 @@ class Looper {
       return;
     }
 
+    const difficultyLevel = this.getDifficultyLevel(this._roundsLeft, this._totalRounds);
     // Pick a word using pic-word-gen library
-    this._currentWord = picWordGenerator.generateWord();
+    this._currentWord = picWordGenerator.generateWord(difficultyLevel);
 
     // emit round started
     this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', {
