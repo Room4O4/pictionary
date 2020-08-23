@@ -61,7 +61,10 @@ class Looper {
         break;
       }
       case this.GAME_STATE_ANNOUNCE_WINNER:
-        this._roomEventBridge.broadcastRoomState(dbUser.id, 'GE_ANNOUNCE_WINNER', this.winners());
+        this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER', {
+          previousWord: this._currentWord,
+          winners: this.winners()
+        });
         break;
       default:
         this._roomEventBridge.broadcastRoomState('GE_IDLE');
@@ -264,7 +267,10 @@ class Looper {
 
   announceWinner () {
     debug('Winner announced!');
-    this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER', this.winners());
+    this._roomEventBridge.broadcastRoomState('GE_ANNOUNCE_WINNER', {
+      previousWord: this._currentWord,
+      winners: this.winners()
+    });
     this._roundsLeft = 0;
     this._totalRounds = 0;
     this._currentWord = null;

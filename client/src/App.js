@@ -109,11 +109,12 @@ function App () {
     setLiveMessage("msgSystemImp!!!It's your turn, Draw!");
   };
 
-  const cbAnnounceWinner = (winners) => {
+  const cbAnnounceWinner = ({ previousWord, winners }) => {
     console.log('EVENT GE_ANNOUNCE_WINNER');
     setShowGuessBox(false);
     setLiveMessage('');
     setWinners(winners);
+    setPreviousWord(previousWord);
     console.log('Announce Winner');
     setShowGuessBox(false);
     setDrawWord(null);
