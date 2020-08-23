@@ -160,7 +160,7 @@ function App () {
     setDrawWord(null);
     setLiveMessage('');
     setPreviousWord(previousWord);
-    setRoundInfo({ current: total - round + 1, total });
+    setRoundInfo({ current: total - round, total });
     setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
     setMessageLog((messageLog) => [
       ...messageLog,
