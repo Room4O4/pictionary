@@ -16,7 +16,7 @@ export const OnScreenKeyboardLayout = {
 
 export const OnScreenKeyboardDisplay = {
   '{numbers}': '123',
-  '{ent}': 'return',
+  '{ent}': 'enter',
   '{escape}': 'esc ⎋',
   '{tab}': 'tab ⇥',
   '{backspace}': '⌫',
