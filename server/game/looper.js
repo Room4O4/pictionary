@@ -8,6 +8,7 @@ class Looper {
     this.GAME_STATE_ROUND_IN_PROGRESS = 1;
     this.GAME_STATE_WAIT_FOR_NEXT_ROUND = 2;
     this.GAME_STATE_ANNOUNCE_WINNER = 3;
+    this._wordsUsedInGame = [];
     this._currentRoundStartTime = 0;
     this._roundStarted = false;
     this._roundsLeft = 0;
@@ -211,7 +212,11 @@ class Looper {
 
     const difficultyLevel = this.getDifficultyLevel(this._roundsLeft, this._totalRounds);
     // Pick a word using pic-word-gen library
-    this._currentWord = picWordGenerator.generateWord(difficultyLevel);
+    // Repeat this till the words are not repeated
+    do {
+      this._currentWord = picWordGenerator.generateWord(difficultyLevel);
+    } while (this._wordsUsedInGame.includes(this._currentWord));
+    this._wordsUsedInGame.push(this._currentWord);
 
     // emit round started
     this._roomEventBridge.broadcastRoomState('GE_NEW_ROUND', {
@@ -274,6 +279,7 @@ class Looper {
     this._roundsLeft = 0;
     this._totalRounds = 0;
     this._currentWord = null;
+    this._wordsUsedInGame = [];
     this._currentUserDrawIndex = 0;
     this._winnerAnnouncementInProgress = true;
     const that = this;
