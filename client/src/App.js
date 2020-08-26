@@ -16,6 +16,7 @@ import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
 import * as GameStateConstants from './constants/AppConstants';
 import GameStateDisplay from './components/game-state-display/GameStateDisplay';
 import CanvasToolbox from './components/toolbox';
+import Audio from './components/audio';
 
 import './App.css';
 
@@ -97,6 +98,16 @@ function App () {
     }
   }, [playerNickname]);
 
+  /**
+   * Plays audio if the id of the audio
+   * component is passed
+   */
+  const playAudio = (key) => {
+    const audioEl = document
+      .querySelector(`#sound_${GameStateConstants.GAME_SOUNDS[key]}`);
+    audioEl.play();
+  };
+
   const cbNewWord = (word) => {
     console.log('EVENT GE_NEW_WORD');
     setLiveMessage('');
@@ -110,6 +121,9 @@ function App () {
   };
 
   const cbAnnounceWinner = ({ previousWord, winners }) => {
+    // Play winner audio
+    playAudio('winner');
+
     console.log('EVENT GE_ANNOUNCE_WINNER');
     setShowGuessBox(false);
     setLiveMessage('');
@@ -163,6 +177,11 @@ function App () {
   };
 
   const cbNewRound = ({ round, total, currentDrawingUser, startTimestamp }) => {
+    if (round < 8) {
+      // Play new round audio
+      playAudio('newRound');
+    }
+
     console.log('EVENT GE_NEW_ROUND');
     const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
     setRoundDuration(secondsLeft);
@@ -185,6 +204,9 @@ function App () {
   };
 
   const cbNewGame = (roundDuration) => {
+    // Play new game audio
+    playAudio('newGame');
+
     console.log('EVENT GE_NEW_GAME');
     setRoundDuration(roundDuration / 1000);
     setCurrentUser((currentUser) => { return { ...currentUser, score: 0 }; });
@@ -216,6 +238,7 @@ function App () {
     console.log('EVENT GE_UPDATE_GUESS');
     let message = '';
     if (liveMessage.found) {
+      playAudio('correctGuess');
       const innerMessage = `${liveMessage.userName} has found the word!`;
       message = `msgSystemFoundWord!!!${innerMessage}`;
       setLiveMessage(message);
@@ -362,6 +385,13 @@ function App () {
     }
   };
 
+  const renderAppSounds = () => {
+    const sounds = Object.values(GameStateConstants.GAME_SOUNDS);
+    return sounds.map(sound => (
+      <Audio name={sound} key={sound} />
+    ));
+  };
+
   const renderAppBar = () => {
     return (
       <AppBar position="static" color="primary">
@@ -463,6 +493,7 @@ function App () {
   return (
     <StylesProvider injectFirst>
       <div className="App">
+        {renderAppSounds()}
         {renderAppBar()}
         <Grid container className="layoutContainer">
           {renderLeftPane()}

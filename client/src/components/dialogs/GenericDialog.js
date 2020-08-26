@@ -9,7 +9,11 @@ const GenericDialog = (props) => {
   const handleClose = () => {
     props.handleClose();
   };
-  const handleDone = () => {
+  const handleDone = (ev) => {
+    if (ev.type === 'keypress' &&
+      ev.key !== 'Enter') {
+      return;
+    }
     props.handleDone();
   };
 
@@ -20,6 +24,7 @@ const GenericDialog = (props) => {
       disableBackdropClick={props.disableBackdropClick}
       disableEscapeKeyDown={props.disableEscapeKeyDown}
       aria-labelledby="form-dialog-title"
+      onKeyPress={handleDone}
     >
       <DialogTitle id="dialog-title">{props.title}</DialogTitle>
       <DialogContent>{props.children}</DialogContent>
