@@ -22,6 +22,7 @@ const AddNicknameDialog = (props) => {
   return (
     <GenericDialog
       open={open}
+      fullScreen={true}
       title={'Enter nickname'}
       displayNegativeAction={false}
       positiveActionText="Save"
