@@ -1,4 +1,5 @@
 import React from 'react';
+import { StylesProvider } from '@material-ui/core/styles';
 import {
   BrowserRouter as Router,
   Switch,
@@ -11,12 +12,14 @@ import Room from './components/room';
 
 function App () {
   return (
-    <Router>
-      <Switch>
-        <Route path="/room" component={Room}/>
-        <Route path="/" component={Home}/>
-      </Switch>
-    </Router>
+    <StylesProvider injectFirst>
+      <Router>
+        <Switch>
+          <Route path="/room" component={Room}/>
+          <Route path="/" component={Home}/>
+        </Switch>
+      </Router>
+    </StylesProvider>
   );
 };
 

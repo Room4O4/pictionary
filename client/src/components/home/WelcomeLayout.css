@@ -1,0 +1,11 @@
+.welcomeLayout {
+  display: flex;
+  justify-content:  center;
+  align-items: center;
+  flex-direction: column;
+  min-height: inherit;
+}
+
+.welcomeLayoutChild {
+  margin-top: 20px;
+}

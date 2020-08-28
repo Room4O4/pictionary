@@ -1,0 +1,13 @@
+.home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.homeLayoutContainer {
+  position: relative;
+  border-radius: 10px;
+  min-width: 50vw;
+  min-height: 50vh;
+}

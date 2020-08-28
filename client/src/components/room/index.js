@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import socket from 'socket.io-client';
 import { TextField, Hidden, IconButton, Badge, Paper, Toolbar, SvgIcon } from '@material-ui/core';
-import { StylesProvider } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import ElementResizeDetectorMaker from 'element-resize-detector';
 import Typography from '@material-ui/core/Typography';
@@ -461,29 +460,27 @@ function Room () {
   };
 
   return (
-    <StylesProvider injectFirst>
-      <div className="Room">
-        {renderAppBar()}
-        <Grid container className="layoutContainer">
-          {renderLeftPane()}
-          {renderMidPane()}
-          <Grid item xs={12} md={4} lg={3}>
-            {renderCanvasToolbox()}
-          </Grid>
-          {!playerNickname && (
-            <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-          )}
-          {shouldShowPlayersList && (
-            <UserScoreListDialog
-              userScores={userScores}
-              handleDone={() => {
-                setShouldShowPlayersList(false);
-              }}
-            />
-          )}
+    <div className="Room">
+      {renderAppBar()}
+      <Grid container className="layoutContainer">
+        {renderLeftPane()}
+        {renderMidPane()}
+        <Grid item xs={12} md={4} lg={3}>
+          {renderCanvasToolbox()}
         </Grid>
-      </div>
-    </StylesProvider>
+        {!playerNickname && (
+          <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
+        )}
+        {shouldShowPlayersList && (
+          <UserScoreListDialog
+            userScores={userScores}
+            handleDone={() => {
+              setShouldShowPlayersList(false);
+            }}
+          />
+        )}
+      </Grid>
+    </div>
   );
 }
 
