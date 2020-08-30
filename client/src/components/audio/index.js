@@ -7,7 +7,7 @@ class Audio extends React.Component {
     const { name } = this.props;
     return (
       <div id="audio" className="audio_container">
-        <audio controls id={`sound_${name}`}>
+        <audio controls id="sound"> {name}
           <source src={require(`../../assets/sounds/${name}.mp3`)} type="audio/mpeg" />
             Your browser does not support the audio element.
         </audio>

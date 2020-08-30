@@ -44,6 +44,7 @@ function App () {
   const [messageLog, setMessageLog] = useState([]);
   const [liveMessage, setLiveMessage] = useState('');
   const [winners, setWinners] = useState([]);
+  const [currentAudio, setCurrentAudio] = useState(GameStateConstants.GAME_SOUNDS.newGame);
 
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
@@ -103,8 +104,12 @@ function App () {
    * component is passed
    */
   const playAudio = (key) => {
-    const audioEl = document
-      .querySelector(`#sound_${GameStateConstants.GAME_SOUNDS[key]}`);
+    setCurrentAudio(GameStateConstants.GAME_SOUNDS[key]);
+
+    const audioEl = document.querySelector('audio#sound');
+    audioEl.src = audioEl.querySelector('source').src;
+
+    audioEl.loop = false;
     audioEl.play();
   };
 
@@ -177,7 +182,7 @@ function App () {
   };
 
   const cbNewRound = ({ round, total, currentDrawingUser, startTimestamp }) => {
-    if (round < 8) {
+    if (round < total) {
       // Play new round audio
       playAudio('newRound');
     }
@@ -385,13 +390,6 @@ function App () {
     }
   };
 
-  const renderAppSounds = () => {
-    const sounds = Object.values(GameStateConstants.GAME_SOUNDS);
-    return sounds.map(sound => (
-      <Audio name={sound} key={sound} />
-    ));
-  };
-
   const renderAppBar = () => {
     return (
       <AppBar position="static" color="primary">
@@ -493,7 +491,7 @@ function App () {
   return (
     <StylesProvider injectFirst>
       <div className="App">
-        {renderAppSounds()}
+        <Audio name={currentAudio} />
         {renderAppBar()}
         <Grid container className="layoutContainer">
           {renderLeftPane()}
