@@ -1,8 +1,10 @@
+import React from 'react';
 import { Button } from '@material-ui/core';
-import styled from 'styled-components';
+import './button.css';
 
-export default styled(Button)`
-  && {
-    background-color: #d1e4f6;
-  }
-`;
+const UIButton = (props) => {
+  const { className, ...otherProps } = props;
+  return <Button className={`${className} button`} {...otherProps}/>;
+};
+
+export default UIButton;
