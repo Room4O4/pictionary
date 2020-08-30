@@ -6,6 +6,6 @@ export const GAME_STATE_ANNOUNCE_WINNER = 4;
 export const GAME_SOUNDS = {
   NEW_GAME: 'new-game',
   NEW_ROUND: 'new-round',
-  WINNDER: 'winner',
+  WINNER: 'winner',
   CORRECT_GUESS: 'correct-guess'
 };
