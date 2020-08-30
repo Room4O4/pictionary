@@ -4,8 +4,8 @@ export const GAME_STATE_NEW_ROUND = 2;
 export const GAME_STATE_WAIT_FOR_NEXT_ROUND = 3;
 export const GAME_STATE_ANNOUNCE_WINNER = 4;
 export const GAME_SOUNDS = {
-  newGame: 'new-game',
-  newRound: 'new-round',
-  winner: 'winner',
-  correctGuess: 'correct-guess'
+  NEW_GAME: 'new-game',
+  NEW_ROUND: 'new-round',
+  WINNDER: 'winner',
+  CORRECT_GUESS: 'correct-guess'
 };

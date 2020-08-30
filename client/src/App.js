@@ -44,7 +44,7 @@ function App () {
   const [messageLog, setMessageLog] = useState([]);
   const [liveMessage, setLiveMessage] = useState('');
   const [winners, setWinners] = useState([]);
-  const [currentAudio, setCurrentAudio] = useState(GameStateConstants.GAME_SOUNDS.newGame);
+  const [currentAudio, setCurrentAudio] = useState(GameStateConstants.GAME_SOUNDS.WINNER);
 
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
@@ -105,12 +105,6 @@ function App () {
    */
   const playAudio = (key) => {
     setCurrentAudio(GameStateConstants.GAME_SOUNDS[key]);
-
-    const audioEl = document.querySelector('audio#sound');
-    audioEl.src = audioEl.querySelector('source').src;
-
-    audioEl.loop = false;
-    audioEl.play();
   };
 
   const cbNewWord = (word) => {
@@ -127,7 +121,7 @@ function App () {
 
   const cbAnnounceWinner = ({ previousWord, winners }) => {
     // Play winner audio
-    playAudio('winner');
+    playAudio('WINNER');
 
     console.log('EVENT GE_ANNOUNCE_WINNER');
     setShowGuessBox(false);
@@ -184,7 +178,7 @@ function App () {
   const cbNewRound = ({ round, total, currentDrawingUser, startTimestamp }) => {
     if (round < total) {
       // Play new round audio
-      playAudio('newRound');
+      playAudio('NEW_ROUND');
     }
 
     console.log('EVENT GE_NEW_ROUND');
@@ -210,7 +204,7 @@ function App () {
 
   const cbNewGame = (roundDuration) => {
     // Play new game audio
-    playAudio('newGame');
+    playAudio('NEW_GAME');
 
     console.log('EVENT GE_NEW_GAME');
     setRoundDuration(roundDuration / 1000);
@@ -243,7 +237,7 @@ function App () {
     console.log('EVENT GE_UPDATE_GUESS');
     let message = '';
     if (liveMessage.found) {
-      playAudio('correctGuess');
+      playAudio('CORRECT_GUESS');
       const innerMessage = `${liveMessage.userName} has found the word!`;
       message = `msgSystemFoundWord!!!${innerMessage}`;
       setLiveMessage(message);
