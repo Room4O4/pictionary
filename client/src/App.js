@@ -9,16 +9,19 @@ import './App.css';
 
 import Home from './components/home';
 import Room from './components/room';
+import { PlayerContextProvider } from './contexts/PlayerContext';
 
 function App () {
   return (
     <StylesProvider injectFirst>
-      <Router>
-        <Switch>
-          <Route path="/room" component={Room}/>
-          <Route path="/" component={Home}/>
-        </Switch>
-      </Router>
+      <PlayerContextProvider>
+        <Router>
+          <Switch>
+            <Route path="/rooms" component={Room}/>
+            <Route path="/" component={Home}/>
+          </Switch>
+        </Router>
+      </PlayerContextProvider>
     </StylesProvider>
   );
 };

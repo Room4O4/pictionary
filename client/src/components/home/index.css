@@ -11,3 +11,12 @@
   min-width: 50vw;
   min-height: 50vh;
 }
+
+@media only screen and (max-width: 600px) {
+  .homeLayoutContainer {
+    position: relative;
+    border-radius: 10px;
+    min-width: 80vw;
+    min-height: 50vh;
+  }
+}

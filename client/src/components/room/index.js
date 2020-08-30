@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import socket from 'socket.io-client';
 import { TextField, Hidden, IconButton, Badge, Paper, Toolbar, SvgIcon } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import { ReactComponent as AppLogo } from '../../assets/logo.svg';
 
 import AppBar from '../appbar';
-import AddNicknameDialog from '../dialogs/AddNicknameDialog';
 import LogWindow from '../log-window';
 import UserScoreList from '../player-list/UserScoreList';
 import PlayersIcon from '../icons/PlayersIcon';
@@ -17,15 +16,14 @@ import GameStateDisplay from '../game-state-display/GameStateDisplay';
 import CanvasToolbox from '../toolbox';
 
 import './index.css';
+import { PlayerContext } from '../../contexts/PlayerContext';
 
-const DEFAULT_ROOM = 'main';
 const ROUND_DURATION = 60;
 
 function Room () {
   const [socketIO, setSocketIO] = useState(null);
-  const [room, setRoom] = useState(DEFAULT_ROOM);
   const [drawWord, setDrawWord] = useState(null);
-  const [playerNickname, setPlayerNickname] = useState(null);
+  const { playerName, roomName } = useContext(PlayerContext);
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
   const [showGuessBox, setShowGuessBox] = useState(false);
   const [disableGuessBox, setDisableGuessBox] = useState(true);
@@ -52,17 +50,17 @@ function Room () {
   }, [showGuessBox]);
 
   useEffect(() => {
-    if (playerNickname) {
+    if (playerName && roomName) {
       const io = socket('http://localhost:3001');
       io.on('connect', () => {
         const user = {
-          id: `${playerNickname}_${+new Date()}`,
-          name: `${playerNickname}`,
+          id: `${playerName}_${+new Date()}`,
+          name: `${playerName}`,
           score: 0
         };
         console.log('Socket connected', user);
 
-        io.emit('C_S_LOGIN', user, room);
+        io.emit('C_S_LOGIN', user, roomName);
 
         io.on('S_C_LOGIN', cbSCLogin);
         io.on('GE_NEW_GAME', cbNewGame);
@@ -86,15 +84,11 @@ function Room () {
           setCurrentUser(null);
         });
       });
-      // Currently adding this line to prevent link check fails as setRoom is unused.
-      // Once Rooms feature is implemented, this shall be used
-      setRoom(room);
-
       setSocketIO(io);
     } else {
-      console.log('playerNickname is null');
+      console.log('playerName is null');
     }
-  }, [playerNickname]);
+  }, [playerName, roomName]);
 
   const cbNewWord = (word) => {
     console.log('EVENT GE_NEW_WORD');
@@ -288,10 +282,6 @@ function Room () {
     }
   };
 
-  const onNicknameAdded = (nickname) => {
-    setPlayerNickname(nickname);
-  };
-
   const handleColorChange = (color) => {
     setCanvasOptions({
       color: color,
@@ -300,7 +290,7 @@ function Room () {
   };
 
   const handleClearCanvas = () => {
-    socketIO.emit('C_S_CLEAR_CANVAS', room);
+    socketIO.emit('C_S_CLEAR_CANVAS', roomName);
   };
 
   const renderPlayersIcon = () => {
@@ -468,9 +458,6 @@ function Room () {
         <Grid item xs={12} md={4} lg={3}>
           {renderCanvasToolbox()}
         </Grid>
-        {!playerNickname && (
-          <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
-        )}
         {shouldShowPlayersList && (
           <UserScoreListDialog
             userScores={userScores}

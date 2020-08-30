@@ -6,7 +6,7 @@ import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 
 import './WelcomeLayout.css';
 
-const WelcomeLayout = () => {
+const WelcomeLayout = (props) => {
   const [nickname, setNickname] = useState(null);
 
   const handleInputChange = (event) => {
@@ -14,7 +14,7 @@ const WelcomeLayout = () => {
   };
 
   const handlePlayClick = (event) => {
-
+    props.onPlayClicked(nickname);
   };
 
   const handleRoomsClick = (event) => {
