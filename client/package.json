@@ -17,14 +17,15 @@
     "react-scripts": "3.4.1",
     "react-window": "^1.8.5",
     "socket.io-client": "^2.3.0",
-    "styled-components": "^5.1.1"
+    "styled-components": "^5.1.1",
+    "prop-types": "^15.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "lint": "eslint ./src/*.js ./src/**/*.js",
-    "lint:fix": "eslint ./src/*.js ./src/**/*.js --fix",
+    "lint": "eslint ./src/*.js ./src/**/*.js -f table",
+    "lint:fix": "eslint ./src/*.js ./src/**/*.js --fix -f table",
     "postbuild": "mv build ../server/"
   },
   "husky": {

@@ -16,6 +16,7 @@ import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
 import * as GameStateConstants from './constants/AppConstants';
 import GameStateDisplay from './components/game-state-display/GameStateDisplay';
 import CanvasToolbox from './components/toolbox';
+import Audio from './components/audio';
 
 import './App.css';
 
@@ -43,6 +44,7 @@ function App () {
   const [messageLog, setMessageLog] = useState([]);
   const [liveMessage, setLiveMessage] = useState('');
   const [winners, setWinners] = useState([]);
+  const [currentAudio, setCurrentAudio] = useState(GameStateConstants.GAME_SOUNDS.WINNER);
 
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
@@ -97,6 +99,14 @@ function App () {
     }
   }, [playerNickname]);
 
+  /**
+   * Plays audio if the id of the audio
+   * component is passed
+   */
+  const playAudio = (key) => {
+    setCurrentAudio(GameStateConstants.GAME_SOUNDS[key]);
+  };
+
   const cbNewWord = (word) => {
     console.log('EVENT GE_NEW_WORD');
     setLiveMessage('');
@@ -110,6 +120,9 @@ function App () {
   };
 
   const cbAnnounceWinner = ({ previousWord, winners }) => {
+    // Play winner audio
+    playAudio('WINNER');
+
     console.log('EVENT GE_ANNOUNCE_WINNER');
     setShowGuessBox(false);
     setLiveMessage('');
@@ -163,6 +176,11 @@ function App () {
   };
 
   const cbNewRound = ({ round, total, currentDrawingUser, startTimestamp }) => {
+    if (round < total) {
+      // Play new round audio
+      playAudio('NEW_ROUND');
+    }
+
     console.log('EVENT GE_NEW_ROUND');
     const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
     setRoundDuration(secondsLeft);
@@ -185,6 +203,9 @@ function App () {
   };
 
   const cbNewGame = (roundDuration) => {
+    // Play new game audio
+    playAudio('NEW_GAME');
+
     console.log('EVENT GE_NEW_GAME');
     setRoundDuration(roundDuration / 1000);
     setCurrentUser((currentUser) => { return { ...currentUser, score: 0 }; });
@@ -216,6 +237,7 @@ function App () {
     console.log('EVENT GE_UPDATE_GUESS');
     let message = '';
     if (liveMessage.found) {
+      playAudio('CORRECT_GUESS');
       const innerMessage = `${liveMessage.userName} has found the word!`;
       message = `msgSystemFoundWord!!!${innerMessage}`;
       setLiveMessage(message);
@@ -463,6 +485,7 @@ function App () {
   return (
     <StylesProvider injectFirst>
       <div className="App">
+        <Audio name={currentAudio} />
         {renderAppBar()}
         <Grid container className="layoutContainer">
           {renderLeftPane()}
