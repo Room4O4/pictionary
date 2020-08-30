@@ -74,7 +74,16 @@ class RoomEventBridge extends EventEmitter {
     const clientSocket = this._getClientSocketInRoom(
       this._userSocketIdMap[userId]
     );
+    let otherPlayers = [];
+    for (const [key, value] of Object.entries(this._io.sockets.connected)) {
+      if (key !== this._userSocketIdMap[userId]) {
+        otherPlayers = [...otherPlayers, value];
+      }
+    }
+
     if (clientSocket) clientSocket.emit('GE_NEW_WORD', word);
+    // Emit hint word event for others
+    otherPlayers.forEach(playerSocker => playerSocker.emit('GE_NEW_HINT_WORD', word));
   }
 
   sendRoomStateToPlayer (userId, eventName, args) {
