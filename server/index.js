@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 
 const datastore = require('./datastore');
 const game = require('./game');
+const { avatarController } = require('./controller');
 const debug = require('debug')('pictionary.server');
 const path = require('path');
 const DEFAULT_ROOM = 'main';
@@ -15,6 +16,15 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+
+/**
+ * Returns list of all avatars
+ */
+app.get('/avatars', (req, res) => {
+  const avatars = avatarController();
+
+  res.send({ avatars });
 });
 
 io.on('connection', (socket) => {
