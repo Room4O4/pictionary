@@ -41,7 +41,7 @@ const GameStateDisplay = ({ gameState, canvasOptions, hintWord }) => {
             liveMessage={gameState.liveMessage}
             roundDuration={gameState.roundDuration}
             canvasOptions={canvasOptions}
-            hintWord={hintWord}
+            hintWord={gameState.hintWord}
           />
         );
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
