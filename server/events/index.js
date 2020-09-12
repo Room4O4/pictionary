@@ -1,6 +1,7 @@
 const EventEmitter = require('events');
 const debug = require('debug')('pictionary.events.roomEventBridge');
-const game = require('../game');
+const constants = require('../constants');
+const { getMaskedHintWord } = require('../helpers');
 
 class RoomEventBridge extends EventEmitter {
   constructor (io, room) {
@@ -84,11 +85,9 @@ class RoomEventBridge extends EventEmitter {
 
     if (clientSocket) clientSocket.emit('GE_NEW_WORD', word);
 
-    const WAIT_FOR = 25 * 1000;
-
     // Emit hint word event for others 25 secs
     setTimeout(() => otherPlayers.forEach(playerSocket => 
-      playerSocket.emit('GE_NEW_HINT_WORD', game.getMaskedHintWord(word))), WAIT_FOR);
+      playerSocket.emit('GE_NEW_HINT_WORD', getMaskedHintWord(word))), constants.HINT_WAIT_TIME);
     }
 
   sendRoomStateToPlayer (userId, eventName, args) {

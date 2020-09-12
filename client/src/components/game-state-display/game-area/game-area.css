@@ -9,27 +9,3 @@
     z-index: 100;
     padding: inherit;
 }
-
-.hint-container {
-    display: flex;
-    justify-content: center;
-    height: 30px;
-}
-
-.hint-letter {
-    height: 100%;
-    width: 30px;
-    border-bottom: 3px solid var(--primaryColor);
-    margin-right: 10px;
-    background: transparent;
-    color: var(--primaryColor);
-    font-size: 25px;
-}
-
-.show {
-    opacity: 1;
-}
-
-.hide {
-    opacity: 0;
-}

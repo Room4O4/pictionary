@@ -347,9 +347,9 @@ function App () {
         );
 
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
-        return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores, hintWord }}/>;
+        return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }}/>;
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
-        return <GameStateDisplay gameState={{ state: gameState, winners, hintWord }} />;
+        return <GameStateDisplay gameState={{ state: gameState, winners }} />;
       default:
         break;
     }
