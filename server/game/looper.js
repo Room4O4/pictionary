@@ -34,7 +34,7 @@ class Looper {
   addUser (dbUser, socketId) {
     const foundUser = this._users.find((user) => dbUser.id === user.id);
     if (!foundUser) {
-      this._users.push({ id: dbUser.id, name: dbUser.name, score: 0, roundInfo: { foundWord: false, isDrawing: false } });
+      this._users.push({ id: dbUser.id, avatar: dbUser.avatar, name: dbUser.name, score: 0, roundInfo: { foundWord: false, isDrawing: false } });
     } else {
       console.log('user already in room');
     }

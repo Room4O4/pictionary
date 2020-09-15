@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const cors = require('cors');
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
@@ -12,6 +13,7 @@ const DEFAULT_ROOM = 'main';
 
 game.setSocketHandle(io);
 
+app.use(cors());
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.get('/', (req, res) => {
@@ -37,6 +39,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('C_S_LOGIN', async (user, room) => {
+    console.log('user', user);
     try {
       // log in the user
       await datastore.login(user);

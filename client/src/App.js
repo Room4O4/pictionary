@@ -28,6 +28,7 @@ function App () {
   const [room, setRoom] = useState(DEFAULT_ROOM);
   const [drawWord, setDrawWord] = useState(null);
   const [playerNickname, setPlayerNickname] = useState(null);
+  const [playerAvatar, setPlayerAvatar] = useState('');
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
   const [showGuessBox, setShowGuessBox] = useState(false);
   const [disableGuessBox, setDisableGuessBox] = useState(true);
@@ -61,6 +62,7 @@ function App () {
         const user = {
           id: `${playerNickname}_${+new Date()}`,
           name: `${playerNickname}`,
+          avatar: playerAvatar,
           score: 0
         };
         console.log('Socket connected', user);
@@ -311,8 +313,9 @@ function App () {
     }
   };
 
-  const onNicknameAdded = (nickname) => {
+  const handleNameAvatarSubmit = ({ nickname, avatar }) => {
     setPlayerNickname(nickname);
+    setPlayerAvatar(avatar);
   };
 
   const handleColorChange = (color) => {
@@ -494,7 +497,7 @@ function App () {
             {renderCanvasToolbox()}
           </Grid>
           {!playerNickname && (
-            <AddNicknameDialog onNicknameAdded={onNicknameAdded} />
+            <AddNicknameDialog handleNameAvatarSubmit={handleNameAvatarSubmit} />
           )}
           {shouldShowPlayersList && (
             <UserScoreListDialog
