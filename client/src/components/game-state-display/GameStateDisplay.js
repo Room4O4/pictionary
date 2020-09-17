@@ -4,7 +4,7 @@ import * as GameStateConstants from '../../constants/AppConstants';
 import GameArea from './game-area/GameArea';
 import './game-state-display.css';
 
-const GameStateDisplay = ({ gameState, canvasOptions }) => {
+const GameStateDisplay = ({ gameState, canvasOptions, hintWord }) => {
   const renderWinnerString = (winners) => {
     if (winners && winners.length > 0) {
       if (winners.length > 1) {
@@ -41,6 +41,7 @@ const GameStateDisplay = ({ gameState, canvasOptions }) => {
             liveMessage={gameState.liveMessage}
             roundDuration={gameState.roundDuration}
             canvasOptions={canvasOptions}
+            hintWord={gameState.hintWord}
           />
         );
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:

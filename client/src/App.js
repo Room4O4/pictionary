@@ -27,6 +27,7 @@ function App () {
   const [socketIO, setSocketIO] = useState(null);
   const [room, setRoom] = useState(DEFAULT_ROOM);
   const [drawWord, setDrawWord] = useState(null);
+  const [hintWord, setHintWord] = useState('');
   const [playerNickname, setPlayerNickname] = useState(null);
   const [shouldShowPlayersList, setShouldShowPlayersList] = useState(false);
   const [showGuessBox, setShowGuessBox] = useState(false);
@@ -73,6 +74,7 @@ function App () {
         io.on('GE_WAIT_FOR_NEXT_ROUND', cbWaitForNextRound);
         io.on('GE_ANNOUNCE_WINNER', cbAnnounceWinner);
         io.on('GE_NEW_WORD', cbNewWord);
+        io.on('GE_NEW_HINT_WORD', cbHintWord);
         io.on('GE_UPDATE_SCORE', cbUpdateScore);
         io.on('GE_UPDATE_GUESS', cbUpdateGuess);
 
@@ -117,6 +119,11 @@ function App () {
       "msgSystemImp!!!It's your turn, Draw!"
     ]);
     setLiveMessage("msgSystemImp!!!It's your turn, Draw!");
+  };
+
+  const cbHintWord = (hintWord) => {
+    console.log('EVENT GE_NEW_HINT_WORD');
+    setHintWord(hintWord);
   };
 
   const cbAnnounceWinner = ({ previousWord, winners }) => {
@@ -185,6 +192,7 @@ function App () {
     const secondsLeft = Math.min(ROUND_DURATION - ((+new Date() - startTimestamp) / 1000), ROUND_DURATION);
     setRoundDuration(secondsLeft);
     setDrawWord(null);
+    setHintWord('');
     setLiveMessage('');
     setGuess('');
     setShowGuessBox(true);
@@ -345,7 +353,7 @@ function App () {
   const renderGameState = () => {
     switch (gameState) {
       case GameStateConstants.GAME_STATE_IDLE:
-        return <GameStateDisplay gameState={{ state: gameState }} />;
+        return <GameStateDisplay gameState={{ state: gameState, hintWord }} />;
       case GameStateConstants.GAME_STATE_NEW_ROUND:
         return (
           <GameStateDisplay
@@ -353,14 +361,15 @@ function App () {
               state: gameState,
               socket: socketIO,
               liveMessage,
-              roundDuration
+              roundDuration,
+              hintWord
             }}
             canvasOptions={{ color: canvasOptions.color, enabled: !!drawWord }}
           />
         );
 
       case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
-        return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }} />;
+        return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }}/>;
       case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
         return <GameStateDisplay gameState={{ state: gameState, winners }} />;
       default:
