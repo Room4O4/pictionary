@@ -7,15 +7,13 @@ const _roomLoopMap = {};
 const _rooms = ['main'];
 let _io = null;
 
-exports.addNewRoom = async (name) => {
-  // Add new rooms!
-};
-
 exports.setSocketHandle = (io) => (_io = io);
 
 // user - user.id, user.socket
 exports.addNewUser = async (userId, userSocketId, room) => {
-  if (!_rooms.includes(room)) throw new Error('No such room');
+  if (!_rooms.includes(room)) {
+    _rooms.push(room);
+  };
   const dbUser = await datastore.getUser(userId);
   if (dbUser) {
     const looper = _roomLoopMap[room];

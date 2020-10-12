@@ -2,23 +2,25 @@ import React, { useState } from 'react';
 import { TextField } from '@material-ui/core';
 import UIButton from '../button';
 import SportsEsportsIcon from '@material-ui/icons/SportsEsports';
-import MeetingRoomIcon from '@material-ui/icons/MeetingRoom';
 
 import './WelcomeLayout.css';
 
+const DEFAULT_ROOM = 'main';
+
 const WelcomeLayout = (props) => {
   const [nickname, setNickname] = useState(null);
+  const [roomname, setRoomname] = useState(DEFAULT_ROOM);
 
-  const handleInputChange = (event) => {
+  const handleNicknameChange = (event) => {
     setNickname(event.target.value);
   };
 
-  const handlePlayClick = (event) => {
-    props.onPlayClicked(nickname);
+  const handleRoomnameChange = (event) => {
+    setRoomname(event.target.value);
   };
 
-  const handleRoomsClick = (event) => {
-
+  const handlePlayClick = (event) => {
+    props.onPlayClicked(nickname, roomname);
   };
 
   return (
@@ -29,8 +31,18 @@ const WelcomeLayout = (props) => {
         id="nickname"
         label="Nickname"
         type="email"
-        onChange={handleInputChange}
+        onChange={handleNicknameChange}
         value={nickname}
+        className="welcomeLayoutChild"
+      />
+      <TextField
+        autoFocus
+        margin="dense"
+        id="roomname"
+        label="Room"
+        type="email"
+        onChange={handleRoomnameChange}
+        value={roomname}
         className="welcomeLayoutChild"
       />
       <UIButton
@@ -38,12 +50,6 @@ const WelcomeLayout = (props) => {
         onClick={handlePlayClick}
         startIcon={<SportsEsportsIcon/>}>
           Play
-      </UIButton>
-      <UIButton
-        className="welcomeLayoutChild"
-        onClick={handleRoomsClick}
-        startIcon={<MeetingRoomIcon/>}>
-          Rooms
       </UIButton>
     </div>
 

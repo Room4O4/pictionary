@@ -1,4 +1,5 @@
 .button {
-   background-image: var(--buttonColor);
+   background-color: var(--primaryColor);
    min-width: 100px;
+   color: white;
 }
