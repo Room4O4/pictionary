@@ -1,5 +1,6 @@
 import React from 'react';
 import './avatar-picker.css';
+import { GAME_SERVER_URL } from '../../constants/AppConstants';
 
 class AvatarPicker extends React.Component {
   constructor (props) {
@@ -12,12 +13,13 @@ class AvatarPicker extends React.Component {
 
   async componentDidMount () {
     const isLocalhost = window.location.host.startsWith('localhost') ||
-    window.location.host.startsWith('127.0.0.1');
+      window.location.host.startsWith('127.0.0.1');
     // Is the node server going to be hosted under /server or root? TODO: change once this is decided
-    const url = isLocalhost ? `${process.env.REACT_APP_SERVER_URL}/avatars` : '/avatars';
-
+    const url = isLocalhost ? `${GAME_SERVER_URL}/avatars` : '/avatars';
+    console.log(url);
     try {
       const response = await fetch(url);
+      console.log(response);
       const { avatars } = await response.json();
       this.setState({ avatars });
     } catch (err) {

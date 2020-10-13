@@ -13,7 +13,7 @@ import LogWindow from './components/log-window';
 import UserScoreList from './components/player-list/UserScoreList';
 import PlayersIcon from './components/icons/PlayersIcon';
 import UserScoreListDialog from './components/dialogs/UserScoreListDialog';
-import * as GameStateConstants from './constants/AppConstants';
+import { GameStates, GameSounds, GAME_SERVER_URL } from './constants/AppConstants';
 import GameStateDisplay from './components/game-state-display/GameStateDisplay';
 import CanvasToolbox from './components/toolbox';
 import Audio from './components/audio';
@@ -39,13 +39,13 @@ function App () {
   const [roundDuration, setRoundDuration] = useState(0);
   const [roundInfo, setRoundInfo] = useState({ current: 0, total: 0 });
   const [gameState, setGameState] = useState(
-    GameStateConstants.GAME_STATE_IDLE
+    GameStates.GAME_STATE_IDLE
   );
   const [canvasOptions, setCanvasOptions] = useState({ color: '#000000', enabled: true });
   const [messageLog, setMessageLog] = useState([]);
   const [liveMessage, setLiveMessage] = useState('');
   const [winners, setWinners] = useState([]);
-  const [currentAudio, setCurrentAudio] = useState(GameStateConstants.GAME_SOUNDS.WINNER);
+  const [currentAudio, setCurrentAudio] = useState(GameSounds.WINNER);
 
   const guessBoxRef = useRef(null);
   const keyboardRef = useRef();
@@ -57,7 +57,7 @@ function App () {
 
   useEffect(() => {
     if (playerNickname) {
-      const io = socket('http://localhost:3001');
+      const io = socket(GAME_SERVER_URL);
       io.on('connect', () => {
         const user = {
           id: `${playerNickname}_${+new Date()}`,
@@ -106,7 +106,7 @@ function App () {
    * component is passed
    */
   const playAudio = (key) => {
-    setCurrentAudio(GameStateConstants.GAME_SOUNDS[key]);
+    setCurrentAudio(GameSounds[key]);
   };
 
   const cbNewWord = (word) => {
@@ -133,7 +133,7 @@ function App () {
     console.log('Announce Winner');
     setShowGuessBox(false);
     setDrawWord(null);
-    setGameState(GameStateConstants.GAME_STATE_ANNOUNCE_WINNER);
+    setGameState(GameStates.GAME_STATE_ANNOUNCE_WINNER);
     if (winners) {
       if (winners.length > 1) {
         let winnersString = '';
@@ -170,7 +170,7 @@ function App () {
     setLiveMessage('');
     setPreviousWord(previousWord);
     setRoundInfo({ current: total - round, total });
-    setGameState(GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND);
+    setGameState(GameStates.GAME_STATE_WAIT_FOR_NEXT_ROUND);
     setMessageLog((messageLog) => [
       ...messageLog,
       'msgSystem!!!Round finished, Wait for next round...'
@@ -193,7 +193,7 @@ function App () {
     setDisableGuessBox(false);
     setPreviousWord(null);
     setRoundInfo({ current: total - round + 1, total });
-    setGameState(GameStateConstants.GAME_STATE_NEW_ROUND);
+    setGameState(GameStates.GAME_STATE_NEW_ROUND);
     console.log(`New Round starting, Round: ${round}, Total: ${total}`);
     const innerMessage = `${currentDrawingUser.id.split('_')[0]} is drawing. Start guessing!`;
     setMessageLog((messageLog) => [
@@ -213,7 +213,7 @@ function App () {
     setCurrentUser((currentUser) => { return { ...currentUser, score: 0 }; });
     setLiveMessage('');
     setWinners([]);
-    setGameState(GameStateConstants.GAME_STATE_NEW_GAME);
+    setGameState(GameStates.GAME_STATE_NEW_GAME);
     setMessageLog((messageLog) => [
       ...messageLog,
       'msgSystem!!!New Game starting...'
@@ -347,9 +347,9 @@ function App () {
 
   const renderGameState = () => {
     switch (gameState) {
-      case GameStateConstants.GAME_STATE_IDLE:
+      case GameStates.GAME_STATE_IDLE:
         return <GameStateDisplay gameState={{ state: gameState }} />;
-      case GameStateConstants.GAME_STATE_NEW_ROUND:
+      case GameStates.GAME_STATE_NEW_ROUND:
         return (
           <GameStateDisplay
             gameState={{
@@ -362,9 +362,9 @@ function App () {
           />
         );
 
-      case GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND:
+      case GameStates.GAME_STATE_WAIT_FOR_NEXT_ROUND:
         return <GameStateDisplay gameState={{ state: gameState, roundInfo, userScores }} />;
-      case GameStateConstants.GAME_STATE_ANNOUNCE_WINNER:
+      case GameStates.GAME_STATE_ANNOUNCE_WINNER:
         return <GameStateDisplay gameState={{ state: gameState, winners }} />;
       default:
         break;
@@ -373,7 +373,7 @@ function App () {
 
   const renderCanvasToolbox = () => {
     console.log(`showGuessBox ${showGuessBox}, gamestate ${gameState}`);
-    if (gameState === GameStateConstants.GAME_STATE_NEW_ROUND && !showGuessBox) {
+    if (gameState === GameStates.GAME_STATE_NEW_ROUND && !showGuessBox) {
       return (
         <Grid container>
           <Grid item xs={11} className="canvasToolboxContainer">
@@ -422,9 +422,9 @@ function App () {
   };
 
   const renderBottomPane = () => {
-    if (gameState === GameStateConstants.GAME_STATE_WAIT_FOR_NEXT_ROUND ||
-      gameState === GameStateConstants.GAME_STATE_IDLE ||
-      gameState === GameStateConstants.GAME_STATE_ANNOUNCE_WINNER) {
+    if (gameState === GameStates.GAME_STATE_WAIT_FOR_NEXT_ROUND ||
+      gameState === GameStates.GAME_STATE_IDLE ||
+      gameState === GameStates.GAME_STATE_ANNOUNCE_WINNER) {
       return <Hidden mdUp>
         <Paper elevation={3} style={{ marginBottom: '10px', marginTop: '10px' }} >
           <UserScoreList userScores={userScores} />
