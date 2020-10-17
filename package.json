@@ -4,8 +4,10 @@
   "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
   "main": "server.js",
   "dependencies": {
+    "cors": "^2.8.5",
     "debug": "^4.1.1",
     "express": "^4.17.1",
+    "fs-extra": "^9.0.1",
     "pic-word-gen": "^1.0.1",
     "socket.io": "^2.3.0"
   },

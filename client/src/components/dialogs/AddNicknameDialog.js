@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
+import './style.css';
 import TextField from '@material-ui/core/TextField';
 
 import GenericDialog from './GenericDialog';
+import AvatarPicker from './AvatarPicker';
 
 const AddNicknameDialog = (props) => {
   const [open, setOpen] = useState(true);
   const [nickname, setNickname] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('');
 
   const handleClose = () => {
     setOpen(false);
   };
 
   const handleDone = () => {
-    props.onNicknameAdded(nickname);
+    props.handleNameAvatarSubmit({ nickname, avatar: selectedAvatar });
   };
 
   const handleInputChange = (event) => {
@@ -22,7 +25,7 @@ const AddNicknameDialog = (props) => {
   return (
     <GenericDialog
       open={open}
-      title={'Enter nickname'}
+      title={'Welcome Aboard!'}
       displayNegativeAction={false}
       positiveActionText="Save"
       handleClose={handleClose}
@@ -40,6 +43,10 @@ const AddNicknameDialog = (props) => {
         value={nickname}
         fullWidth
       />
+      <div className="avatar-label">
+        Choose your avatar
+      </div>
+      <AvatarPicker setSelectedAvatar={setSelectedAvatar}/>
     </GenericDialog>
   );
 };

@@ -4,6 +4,7 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from 'react-avatar';
+import UserAvatar from './UserAvatar';
 import { Typography } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
 import './UserScoreList.css';
@@ -18,15 +19,17 @@ const buildUserList = (userScores) => {
         key={userScore.id}
         className="userScoreListItem"
       >
-        <ListItemAvatar>
-          {!userScore.roundInfo.isDrawing ? <Avatar
-            name={userScore.name}
-            round={true}
-            size="30"
-            textSizeRatio={1.75}
-          /> : <CreateIcon />}
 
-        </ListItemAvatar>
+        {
+          !userScore.avatar.length ? <ListItemAvatar>
+            {!userScore.roundInfo.isDrawing ? <Avatar
+              name={userScore.name}
+              round={true}
+              size="30"
+              textSizeRatio={1.75}
+            /> : <CreateIcon />} </ListItemAvatar> : <UserAvatar avatar={userScore.avatar} />
+        }
+
         <ListItemText>
           <Typography variant="body1" className="userScoreListItemId">
             <span className={`${usernameListClass}`}>{userScore.name}</span>
