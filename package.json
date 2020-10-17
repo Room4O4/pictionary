@@ -20,13 +20,15 @@
     "eslint-plugin-standard": "^4.0.1",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
+    "nodemon": "^2.0.4",
     "prettier-eslint": "^11.0.0",
     "prettier-eslint-cli": "^5.0.0"
   },
   "scripts": {
     "start": "node server/index.js",
     "lint": "eslint ./server/*.js ./server/**/*.js",
-    "lint:fix": "eslint ./server/*.js ./server/**/*.js --fix"
+    "lint:fix": "eslint ./server/*.js ./server/**/*.js --fix",
+    "dev": "nodemon server/"
   },
   "husky": {
     "hooks": {

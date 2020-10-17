@@ -2,11 +2,13 @@ import React, { Fragment } from 'react';
 import Canvas from './Canvas';
 import FadeOutText from './anim/FadeOutText';
 import ReactCountdownClock from 'react-countdown-clock';
+import GameHint from './GameHint';
 import './game-area.css';
 
-const GameArea = ({ socket, liveMessage, roundDuration, canvasOptions }) => {
+const GameArea = ({ socket, liveMessage, roundDuration, canvasOptions, hintWord }) => {
   return (
     <Fragment>
+      { hintWord !== '' ? <GameHint hintWord={hintWord}/> : '' }
       <Canvas io={socket} canvasOptions={canvasOptions}/>
       <div className="live-message">
         <FadeOutText text={liveMessage}></FadeOutText>
