@@ -86,9 +86,9 @@ class RoomEventBridge extends EventEmitter {
     if (clientSocket) clientSocket.emit('GE_NEW_WORD', word);
 
     // Emit hint word event for others 25 secs
-    setTimeout(() => otherPlayers.forEach(playerSocket => 
+    setTimeout(() => otherPlayers.forEach(playerSocket =>
       playerSocket.emit('GE_NEW_HINT_WORD', getMaskedHintWord(word))), constants.HINT_WAIT_TIME);
-    }
+  }
 
   sendRoomStateToPlayer (userId, eventName, args) {
     const clientSocket = this._getClientSocketInRoom(
