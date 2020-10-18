@@ -31,7 +31,7 @@ const shuffleArray = (arr) => {
 
 const avatarController = () => {
   const allFiles = getAllFiles(path.join(process.cwd(), '/client/src/assets/avatars'))
-    .map(fileName => `${path.dirname(fileName).split('/').pop()}/${path.basename(fileName)}`); // -> folder/fileName
+    .map(fileName => `${path.basename(path.dirname(fileName))}/${path.basename(fileName)}`); // -> folder/fileName
   return shuffleArray(allFiles);
 };
 
