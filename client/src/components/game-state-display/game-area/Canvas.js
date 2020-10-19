@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import './canvas.css';
 
-const Canvas = ({ io, canvasOptions }) => {
-  let drawing = false;
-  const current = { x: 0, y: 0 };
+const Canvas = React.memo(({ io, canvasOptions }) => {
+  const isDrawingRef = useRef(false);
+  const lastCoordinate = useRef({ x: 0, y: 0 });
   const canvasRef = useRef(null);
-
+  console.log('rendering...');
   /*
    * The below four methods helps resize the canvas and preserve scale.
    * However at this point, we don't care about resizing as people rarely do that
@@ -122,19 +122,19 @@ const Canvas = ({ io, canvasOptions }) => {
 
       var x = (inputX - rect.left) * scaleX; // x position within the element.
       var y = (inputY - rect.top) * scaleY; // y position within the element.
-      drawing = true;
-      current.x = x;
-      current.y = y;
+      isDrawingRef.current = true;
+      lastCoordinate.current.x = x;
+      lastCoordinate.current.y = y;
     } else {
-      drawing = false;
+      isDrawingRef.current = false;
     }
   }
 
   function onMouseUp (e) {
-    if (!drawing) {
+    if (!isDrawingRef.current) {
       return;
     }
-    drawing = false;
+    isDrawingRef.current = false;
     if (!e || e.touches) {
       return;
     }
@@ -147,11 +147,11 @@ const Canvas = ({ io, canvasOptions }) => {
     var x = (inputX - rect.left) * scaleX; // x position within the element.
     var y = (inputY - rect.top) * scaleY; // y position within the element.
 
-    drawLine(current.x, current.y, x, y, canvasOptions.color, true);
+    drawLine(lastCoordinate.current.x, lastCoordinate.current.y, x, y, canvasOptions.color, true);
   }
 
   function onMouseMove (e) {
-    if (!drawing) {
+    if (!isDrawingRef.current) {
       return;
     }
     var rect = e.target.getBoundingClientRect();
@@ -162,9 +162,9 @@ const Canvas = ({ io, canvasOptions }) => {
     var x = (inputX - rect.left) * scaleX; // x position within the element.
     var y = (inputY - rect.top) * scaleY; // y position within the element.
 
-    drawLine(current.x, current.y, x, y, canvasOptions.color, true);
-    current.x = x;
-    current.y = y;
+    drawLine(lastCoordinate.current.x, lastCoordinate.current.y, x, y, canvasOptions.color, true);
+    lastCoordinate.current.x = x;
+    lastCoordinate.current.y = y;
   }
 
   // limit the number of events per second
@@ -200,6 +200,13 @@ const Canvas = ({ io, canvasOptions }) => {
       ref={canvasRef}
     />
   );
-};
+}, function propsAreEqual (prevProps, nextProps) {
+  if (prevProps.canvasOptions.color !== nextProps.canvasOptions.color ||
+    prevProps.canvasOptions.enabled !== nextProps.canvasOptions.enabled) {
+    return false;
+  } else {
+    return true;
+  }
+});
 
 export default Canvas;

@@ -381,7 +381,6 @@ function App () {
   };
 
   const renderCanvasToolbox = () => {
-    console.log(`showGuessBox ${showGuessBox}, gamestate ${gameState}`);
     if (gameState === GameStates.GAME_STATE_NEW_ROUND && !showGuessBox) {
       return (
         <Grid container>
