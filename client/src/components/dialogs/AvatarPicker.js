@@ -21,14 +21,12 @@ const AvatarPicker = (props) => {
           window.location.host.startsWith('127.0.0.1');
           // Is the node server going to be hosted under /server or root? TODO: change once this is decided
           const url = isLocalhost ? `${GAME_SERVER_URL}/avatars` : '/avatars';
-          console.log(url);
           const response = await fetch(url);
-          console.log(response);
           const { avatars } = await response.json();
           setAvatars(avatars);
         }
       } catch (error) {
-        console.log('Error in AvatarPicker useEffect', error);
+        console.error('Error in displaying avatars: ', error);
       }
     }
 
