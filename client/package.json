@@ -26,7 +26,8 @@
     "eject": "react-scripts eject",
     "lint": "eslint ./src/*.js ./src/**/*.js -f table",
     "lint:fix": "eslint ./src/*.js ./src/**/*.js --fix -f table",
-    "postbuild": "mv build ../server/"
+    "postbuild": "mv build ../server/",
+    "sassify": "styleflux -o ./src/"
   },
   "husky": {
     "hooks": {
@@ -64,6 +65,7 @@
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "prettier-eslint": "^11.0.0",
-    "prettier-eslint-cli": "^5.0.0"
+    "prettier-eslint-cli": "^5.0.0",
+    "styleflux": "^1.2.0"
   }
 }

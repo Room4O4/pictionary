@@ -18,7 +18,7 @@ import GameStateDisplay from './components/game-state-display/GameStateDisplay';
 import CanvasToolbox from './components/toolbox';
 import Audio from './components/audio';
 
-import './App.css';
+import './App.scss';
 
 const DEFAULT_ROOM = 'main';
 const ROUND_DURATION = 60;

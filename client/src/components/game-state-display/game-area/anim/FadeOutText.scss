@@ -2,6 +2,35 @@
   -webkit-animation: fado 15s 1 forwards;
   -moz-animation: fado 15s 1 forwards;
   animation: fado 15s 1 forwards;
+
+
+  &.msgBasic {
+    font-size: x-large;
+  }
+
+  &.msgSystem {
+    color: black;
+  }
+
+  &.msgSystemImp {
+    color: red;
+  }
+
+  &.msgSystemGuess {
+    color: blue;
+  }
+
+  &.msgUserGuess {
+    color: blue;
+  }
+
+  &.msgSystemFoundWord {
+    color: red;
+  }
+
+  &.msgSystemWinner {
+    color:darkgreen;
+  }
 }
 
 @keyframes fado {
@@ -29,32 +58,4 @@
   100% {
     opacity: 0;
   }
-}
-
-.msgBasic {
-  font-size: x-large;
-}
-
-.msgSystem {
-  color: black;
-}
-
-.msgSystemImp {
-  color: red;
-}
-
-.msgSystemGuess {
-  color: blue;
-}
-
-.msgUserGuess {
-  color: blue;
-}
-
-.msgSystemFoundWord {
-  color: red;
-}
-
-.msgSystemWinner {
-  color:darkgreen;
 }

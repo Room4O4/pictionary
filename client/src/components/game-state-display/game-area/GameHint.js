@@ -1,5 +1,5 @@
 import React from 'react';
-import './game-hint.css';
+import './game-hint.scss';
 
 const GameHint = ({ hintWord }) => {
   return (

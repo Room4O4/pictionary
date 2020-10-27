@@ -1,7 +1,7 @@
 import React from 'react';
 import { CirclePicker } from 'react-color';
 import { Grid, Paper } from '@material-ui/core';
-import './toolbox.css';
+import './toolbox.scss';
 import UIButton from '../button';
 
 const CanvasToolbox = ({ onColorChanged, onClearCanvasPressed }) => {

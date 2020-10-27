@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Typography } from '@material-ui/core';
 import { GameStates } from '../../constants/AppConstants';
 import GameArea from './game-area/GameArea';
-import './game-state-display.css';
+import './game-state-display.scss';
 
 const GameStateDisplay = ({ gameState, canvasOptions, hintWord }) => {
   const renderWinnerString = (winners) => {

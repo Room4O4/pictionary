@@ -7,7 +7,7 @@ import Avatar from 'react-avatar';
 import UserAvatar from './UserAvatar';
 import { Typography } from '@material-ui/core';
 import CreateIcon from '@material-ui/icons/Create';
-import './UserScoreList.css';
+import './UserScoreList.scss';
 
 const buildUserList = (userScores) => {
   if (!userScores) return null;

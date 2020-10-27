@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './style.css';
+import './style.scss';
 import TextField from '@material-ui/core/TextField';
 
 import GenericDialog from './GenericDialog';
