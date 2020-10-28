@@ -39,7 +39,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('C_S_LOGIN', async (user, room) => {
-    console.log('user', user);
     try {
       // log in the user
       await datastore.login(user);
