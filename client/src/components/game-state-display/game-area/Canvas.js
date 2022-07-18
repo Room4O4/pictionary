@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import './canvas.css';
+import './canvas.scss';
 
 const Canvas = React.memo(({ io, canvasOptions }) => {
   const isDrawingRef = useRef(false);

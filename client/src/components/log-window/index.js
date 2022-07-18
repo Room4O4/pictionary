@@ -3,7 +3,7 @@ import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import { Paper, Typography } from '@material-ui/core';
-import './LogWindow.css';
+import './LogWindow.scss';
 
 const LogWindow = ({ messages, height }) => {
   const listRef = useRef();

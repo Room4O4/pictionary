@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import './FadeOutText.css';
+import './FadeOutText.scss';
 
 const FadeOutText = ({ text }) => {
   const fadeOutElem = useRef(null);

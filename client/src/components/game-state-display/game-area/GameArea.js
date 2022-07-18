@@ -3,7 +3,7 @@ import Canvas from './Canvas';
 import FadeOutText from './anim/FadeOutText';
 import ReactCountdownClock from 'react-countdown-clock';
 import GameHint from './GameHint';
-import './game-area.css';
+import './game-area.scss';
 
 const GameArea = ({ socket, liveMessage, roundDuration, canvasOptions, hintWord }) => {
   return (

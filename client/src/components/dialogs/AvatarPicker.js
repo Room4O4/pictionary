@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './avatar-picker.css';
+import './avatar-picker.scss';
 import { GAME_SERVER_URL } from '../../constants/AppConstants';
 
 const AvatarPicker = (props) => {
